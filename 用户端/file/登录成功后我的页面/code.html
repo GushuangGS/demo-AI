@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#191c1e",
+                    "secondary": "#4d5b94",
+                    "on-primary-container": "#cad3ff",
+                    "error": "#ba1a1a",
+                    "outline": "#747686",
+                    "surface": "#f7f9fb",
+                    "secondary-fixed-dim": "#b7c4ff",
+                    "on-tertiary-fixed": "#390c00",
+                    "primary-fixed": "#dce1ff",
+                    "on-secondary-fixed": "#03164d",
+                    "secondary-fixed": "#dce1ff",
+                    "outline-variant": "#c4c5d7",
+                    "background": "#f7f9fb",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#001551",
+                    "on-background": "#191c1e",
+                    "inverse-on-surface": "#eff1f3",
+                    "tertiary-container": "#a73400",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary-fixed-variant": "#35437b",
+                    "surface-container-low": "#f2f4f6",
+                    "on-tertiary-fixed-variant": "#832700",
+                    "secondary-container": "#b0befe",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "tertiary-fixed": "#ffdbcf",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-surface-variant": "#434655",
+                    "primary-container": "#1d4ed8",
+                    "inverse-surface": "#2d3133",
+                    "on-tertiary": "#ffffff",
+                    "tertiary": "#7f2500",
+                    "primary": "#0037b0",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container": "#eceef0",
+                    "surface-variant": "#e0e3e5",
+                    "surface-tint": "#2151da",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#b7c4ff",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#f7f9fb",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#0039b5",
+                    "on-secondary-container": "#3d4c83",
+                    "on-tertiary-container": "#ffc9b7",
+                    "tertiary-fixed-dim": "#ffb59c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-[#f7f9fb]/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#0037b0] cursor-pointer">menu</span>
+<h1 class="text-xl font-extrabold tracking-tighter text-[#0037b0] font-['Plus_Jakarta_Sans']">Urban Architect</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User Profile" data-alt="professional headshot of a smiling man in a creative studio environment with soft natural lighting and warm tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAea2OR0Go6r13YEByR4WtZURQ5RNVFiLedA-oQ4JUf-g2Sz6f82t3Ssnvt0n7MfE_bruiPgLAcyT4MnzEAchesqJlbGBjUk5FlV-Yq4Cvd1Yy9cjl5eUMajDaCtcVKXy7nUHkfCodfY1VvG2dMS3wIyys6Ro_3y2gZObmg65omIcaiqLkYhmWeymB5lDXeE0xysIDQrFmxI3GzpE1Pcd-XtLuP3Ic89tM4z5_eLzyXTddubniSxH9kZ39MB5SxtARoCEKIRDPlU9U"/>
+</div>
+</header>
+<main class="pt-20 px-6 max-w-2xl mx-auto">
+<!-- Profile Section: Architectural Focus -->
+<section class="mb-8 relative">
+<div class="flex items-end justify-between mb-6">
+<div>
+<h2 class="text-3xl font-extrabold tracking-tight text-on-surface mb-1">个人中心</h2>
+<p class="text-on-surface-variant text-sm flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                        高级会员 · 城市规划师
+                    </p>
+</div>
+<div class="p-3 bg-primary-fixed rounded-2xl">
+<span class="material-symbols-outlined text-primary text-2xl">qr_code_2</span>
+</div>
+</div>
+<!-- Bento Profile Card -->
+<div class="grid grid-cols-12 gap-4">
+<div class="col-span-12 bg-surface-container-lowest p-6 rounded-3xl shadow-[0_-4px_40px_rgba(25,28,30,0.04)] relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110 duration-500"></div>
+<div class="flex items-center gap-5 relative z-10">
+<div class="w-20 h-20 rounded-2xl overflow-hidden shadow-lg">
+<img alt="Avatar" data-alt="close-up portrait of a male urban planner with glasses looking confident in a bright modern office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANl9WSCHpXMxwnjD19rV39W6rh804lx_fgnrJziATE7DXZBayYNaZyTYhSLaMLiew5W62y0rbSGTYHjJNOzaSLGa2v-12-js6XtaqKZbjpoe2_mk-_Q8QNpBLNLcxoWKoGtM9oLz9mfhtcqUTVj-WDYGDmrhvMG7d16MW70ttWYOZmMZXKPEq-8EUFHwsiYCeHjXKFGKEkbBdV65iQffWMnpLCgQxuqTmU2CoSqh3P97alm_IT2q2aj7ULDh3jooXPq2OVQrInQ6c"/>
+</div>
+<div>
+<h3 class="text-xl font-bold text-on-surface">陈子昂</h3>
+<p class="text-on-surface-variant text-sm mt-1">ID: 8829-ARCH-01</p>
+<div class="flex gap-2 mt-3">
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase tracking-wider">Verified</span>
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary text-[10px] font-bold rounded-full uppercase tracking-wider">Level 5</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Financial Dashboard: Asymmetric Cards -->
+<section class="mb-10">
+<div class="grid grid-cols-2 gap-4">
+<!-- Account Balance -->
+<div class="bg-primary p-6 rounded-3xl text-on-primary flex flex-col justify-between aspect-square relative overflow-hidden">
+<div class="absolute bottom-0 right-0 opacity-10">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<div>
+<span class="text-xs font-semibold tracking-widest opacity-70 uppercase">账户余额</span>
+<div class="text-3xl font-extrabold mt-1">¥12,840.50</div>
+</div>
+<div class="flex items-center gap-1 text-xs font-bold bg-white/20 w-fit px-3 py-1.5 rounded-full backdrop-blur-md">
+                        立即充值
+                        <span class="material-symbols-outlined text-sm">chevron_right</span>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Coupons Card -->
+<div class="bg-surface-container-low p-5 rounded-3xl flex-1 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">confirmation_number</span>
+<span class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-lg">4 张</span>
+</div>
+<div>
+<div class="text-lg font-bold text-on-surface leading-tight">优惠券</div>
+<div class="text-xs text-on-surface-variant mt-1">最近到期: 3天后</div>
+</div>
+</div>
+<!-- Points/Credits -->
+<div class="bg-secondary-container/30 p-5 rounded-3xl flex-1 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-secondary text-2xl" style="font-variation-settings: 'FILL' 1;">stars</span>
+</div>
+<div>
+<div class="text-lg font-bold text-on-surface leading-tight">积分商城</div>
+<div class="text-xs text-on-surface-variant mt-1">可用积分: 2,450</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Service Settings: Editorial List -->
+<section class="mb-10">
+<h4 class="text-xs font-extrabold text-outline uppercase tracking-[0.2em] mb-6">服务与设置</h4>
+<div class="bg-surface-container-lowest rounded-[2rem] overflow-hidden p-2 space-y-1">
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low rounded-2xl transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div>
+<div class="font-bold text-on-surface">系统设置</div>
+<div class="text-xs text-on-surface-variant">偏好、隐私与安全</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low rounded-2xl transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div>
+<div class="font-bold text-on-surface">地址管理</div>
+<div class="text-xs text-on-surface-variant">3 个常用服务点</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low rounded-2xl transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">support_agent</span>
+</div>
+<div>
+<div class="font-bold text-on-surface">在线客服</div>
+<div class="text-xs text-on-surface-variant">24/7 专属管家</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 hover:bg-surface-container-low rounded-2xl transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<div class="font-bold text-on-surface">协议规则</div>
+<div class="text-xs text-on-surface-variant">服务条款与政策</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Logout Trigger -->
+<button class="w-full py-5 text-error font-bold flex items-center justify-center gap-2 hover:bg-error/5 rounded-2xl transition-colors">
+<span class="material-symbols-outlined">logout</span>
+            退出当前账号
+        </button>
+</main>
+<!-- Bottom Navigation Bar (Shell) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-2 pb-6 bg-[#ffffff]/90 backdrop-blur-2xl rounded-t-[1.5rem] z-50 shadow-[0_-4px_40px_rgba(25,28,30,0.06)] border-t border-[#c4c5d7]/15">
+<div class="flex flex-col items-center justify-center text-[#434655] opacity-60 hover:bg-[#f2f4f6] rounded-xl px-5 py-1.5 transition-all">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">预约</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#434655] opacity-60 hover:bg-[#f2f4f6] rounded-xl px-5 py-1.5 transition-all">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">订单</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#0037b0] bg-[#dce1ff] rounded-2xl px-5 py-1.5 transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">我的</span>
+</div>
+</nav>
+</body></html>

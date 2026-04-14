@@ -1,52 +1,351 @@
 <template>
-	<view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<view class="text-area">
-			<text class="title">{{title}}</text>
-		</view>
-	</view>
+  <view class="bg-surface text-on-surface antialiased min-h-screen">
+    <!-- TopAppBar -->
+    <view
+      class="fixed top-0 w-full z-50 bg-[#f7f9fb]/80 dark:bg-slate-900/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full"
+    >
+      <view class="flex items-center gap-3">
+        <text class="material-symbols-outlined text-[#0037b0] dark:text-blue-400">menu</text>
+        <text
+          class="text-xl font-extrabold tracking-tighter text-[#0037b0] dark:text-blue-400 font-['Plus_Jakarta_Sans']"
+          >Urban Architect</text
+        >
+      </view>
+      <view class="flex items-center gap-4">
+        <view class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+          <image
+            class="w-full h-full object-cover"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9sve-wEPYIXTF7DfqPPa6qc_CVthX1AD85b2vPbjr_EeY6f30aVJSLvhl4yEjvTjT-kL3t6197LbZxDwUEYuNhbExJB29v5Q77_Ikt6pUDc5nxWLtASOOEnk5a3hsiv7BjeIGZGz5-RnSv5gHwu-v6cAnIdgfLqFqKmEG04aAkkSiR3gepSn6x_o0azAZjf4Ylad6CuDvEYp1d0ehXnaR5SyTQhUXlM_CA0DfpjAADEqk1Ojti5mM0zvp4E2_JokO0kNniTqJfyQ"
+            mode="aspectFill"
+          ></image>
+        </view>
+      </view>
+    </view>
+    <view class="pt-24 pb-32 px-6 max-w-7xl mx-auto">
+      <!-- Hero Search Section -->
+      <view class="mb-10">
+        <view class="text-4xl md:text-5xl font-bold tracking-tight text-on-surface mb-4">
+          欢迎回来，<text class="text-primary">张先生</text>
+        </view>
+        <view class="text-on-surface-variant text-lg max-w-2xl mb-8">
+          您的城市生活建筑师。无论买、送、办，我们随时待命。
+        </view>
+        <view class="relative group max-w-3xl">
+          <view class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+            <text class="material-symbols-outlined text-primary">search</text>
+          </view>
+          <input
+            class="w-full bg-surface-container-high border-none rounded-2xl py-5 pl-14 pr-6 focus:ring-2 focus:ring-primary/20 transition-all text-on-surface placeholder:text-on-surface-variant/60"
+            placeholder="搜寻附近的服务或快递员..."
+            type="text"
+          />
+        </view>
+      </view>
+      <!-- 2x2 Bento Grid Services -->
+      <view class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+        <!-- 帮我买 -->
+        <view
+          class="group relative overflow-hidden bg-surface-container-low rounded-[2rem] p-6 transition-all hover:bg-surface-container-lowest hover:shadow-xl hover:shadow-primary/5 cursor-pointer"
+        >
+          <view class="mb-8 w-12 h-12 bg-primary-fixed rounded-2xl flex items-center justify-center text-primary">
+            <text class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">shopping_bag</text>
+          </view>
+          <view class="text-xl font-bold mb-2">帮我买</view>
+          <view class="text-sm text-on-surface-variant leading-relaxed">餐饮、生鲜、药品<br />30分钟送达</view>
+          <view class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <text class="material-symbols-outlined text-[120px]">shopping_cart</text>
+          </view>
+        </view>
+        <!-- 帮我送 -->
+        <view
+          class="group relative overflow-hidden bg-surface-container-low rounded-[2rem] p-6 transition-all hover:bg-surface-container-lowest hover:shadow-xl hover:shadow-primary/5 cursor-pointer"
+        >
+          <view
+            class="mb-8 w-12 h-12 bg-secondary-container rounded-2xl flex items-center justify-center text-on-secondary-container"
+          >
+            <text class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">local_shipping</text>
+          </view>
+          <view class="text-xl font-bold mb-2">帮我送</view>
+          <view class="text-sm text-on-surface-variant leading-relaxed">急件、鲜花、蛋糕<br />全城专人直送</view>
+          <view class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <text class="material-symbols-outlined text-[120px]">package_2</text>
+          </view>
+        </view>
+        <!-- 帮我办 -->
+        <view
+          class="group relative overflow-hidden bg-surface-container-low rounded-[2rem] p-6 transition-all hover:bg-surface-container-lowest hover:shadow-xl hover:shadow-primary/5 cursor-pointer"
+        >
+          <view class="mb-8 w-12 h-12 bg-tertiary-fixed rounded-2xl flex items-center justify-center text-tertiary">
+            <text class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">assignment</text>
+          </view>
+          <view class="text-xl font-bold mb-2">帮我办</view>
+          <view class="text-sm text-on-surface-variant leading-relaxed">排队、挂号、代取<br />节省您的每一分钟</view>
+          <view class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <text class="material-symbols-outlined text-[120px]">task</text>
+          </view>
+        </view>
+        <!-- 万能帮 -->
+        <view
+          class="group relative overflow-hidden bg-primary-container rounded-[2rem] p-6 transition-all hover:shadow-xl hover:shadow-primary/20 cursor-pointer"
+        >
+          <view
+            class="mb-8 w-12 h-12 bg-on-primary-container rounded-2xl flex items-center justify-center text-primary-container"
+          >
+            <text class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">auto_awesome</text>
+          </view>
+          <view class="text-xl font-bold mb-2 text-white">万能帮</view>
+          <view class="text-sm text-on-primary-container leading-relaxed"
+            >各种个性化需求<br />只有想不到，没有做不到</view
+          >
+          <view class="absolute -right-4 -bottom-4 opacity-20 group-hover:opacity-30 transition-opacity">
+            <text class="material-symbols-outlined text-[120px] text-white">magic_button</text>
+          </view>
+        </view>
+      </view>
+      <view class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Quick Order Section -->
+        <view class="lg:col-span-2">
+          <view class="flex items-center justify-between mb-6">
+            <view class="text-2xl font-bold tracking-tight">快速预约</view>
+            <view class="text-primary font-semibold text-sm flex items-center gap-1">
+              历史地址 <text class="material-symbols-outlined text-sm">history</text>
+            </view>
+          </view>
+          <view
+            class="bg-surface-container-lowest rounded-[2rem] p-8 space-y-6 shadow-sm border border-outline-variant/10"
+          >
+            <view class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <view class="space-y-2">
+                <view class="text-sm font-bold text-on-surface-variant ml-1">取货地址</view>
+                <view class="flex items-center bg-surface-container rounded-2xl px-4 py-4">
+                  <text class="material-symbols-outlined text-primary mr-3">location_on</text>
+                  <input
+                    class="bg-transparent border-none p-0 w-full focus:ring-0 text-sm font-medium"
+                    type="text"
+                    value="北京市朝阳区三里屯SOHO 5号楼"
+                  />
+                </view>
+              </view>
+              <view class="space-y-2">
+                <view class="text-sm font-bold text-on-surface-variant ml-1">收货地址</view>
+                <view class="flex items-center bg-surface-container rounded-2xl px-4 py-4">
+                  <text class="material-symbols-outlined text-tertiary mr-3">near_me</text>
+                  <input
+                    class="bg-transparent border-none p-0 w-full focus:ring-0 text-sm font-medium"
+                    placeholder="输入收货地址..."
+                    type="text"
+                  />
+                </view>
+              </view>
+            </view>
+            <view class="flex flex-wrap gap-3">
+              <text
+                class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-primary-fixed hover:text-primary transition-colors"
+                >手机数码</text
+              >
+              <text
+                class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-primary-fixed hover:text-primary transition-colors"
+                >文件合同</text
+              >
+              <text
+                class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-primary-fixed hover:text-primary transition-colors"
+                >钥匙配饰</text
+              >
+              <text
+                class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-primary-fixed hover:text-primary transition-colors"
+                >+ 自定义物品</text
+              >
+            </view>
+            <view
+              class="w-full bg-primary py-5 rounded-2xl text-white text-center font-bold text-lg hover:bg-primary-container transition-all active:scale-[0.98]"
+            >
+              立即呼叫服务
+            </view>
+          </view>
+        </view>
+        <!-- Nearby Couriers -->
+        <view>
+          <view class="flex items-center justify-between mb-6">
+            <view class="text-2xl font-bold tracking-tight">附近跑男</view>
+            <text class="text-xs font-bold text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full"
+              >12人在线</text
+            >
+          </view>
+          <view class="space-y-4">
+            <!-- Courier 1 -->
+            <view
+              class="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl hover:bg-surface-container-high transition-colors"
+            >
+              <view class="relative">
+                <image
+                  class="w-14 h-14 rounded-xl object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9s1Q218GYts49tw3dJdDAKx_WFhr3j0PrdPyFp6BytJmk3GosTQJpd1I2l_-gBm_BXSqXp-zlt8WBBI95tZqlW4-o7aEPnjqRhwkjAO0wTeH44IkWPK8NsQd1bYaCfMns92TCbuCVSbdCrrHcdO6Kr9KmY8CiI55DooLTNPTb1PX2bPSCblUp2JydgsELXMspLNj4_n9pdLbWaP3N1TbbyeFCeQ0MOvkMhm8fH3hF6chby3u4bWP4zur-kKg5qi9wWS56QAAOtis"
+                  mode="aspectFill"
+                ></image>
+                <view
+                  class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-surface-container-low rounded-full"
+                ></view>
+              </view>
+              <view class="flex-1">
+                <view class="flex justify-between items-start">
+                  <view class="font-bold">王师傅</view>
+                  <view class="flex items-center text-primary">
+                    <text class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1"
+                      >star</text
+                    >
+                    <text class="text-xs font-bold ml-0.5">4.9</text>
+                  </view>
+                </view>
+                <view class="text-xs text-on-surface-variant mt-0.5">距离 500m | 已接 2.4k 单</view>
+                <view class="mt-2 flex gap-1">
+                  <text class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">准时达</text>
+                  <text class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">好评如潮</text>
+                </view>
+              </view>
+            </view>
+            <!-- Courier 2 -->
+            <view
+              class="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl hover:bg-surface-container-high transition-colors"
+            >
+              <view class="relative">
+                <image
+                  class="w-14 h-14 rounded-xl object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuApwY8seJM0qJvyBT-hjf1syEYderUuCTXD90H_cqEizaCs0kuv7UU4cF3YF1ltllN5ttjClcNLcrF-mjAav9Z-vE5Sg7HFUOrOK2KXrYp7b7O5h3hh2ZnAK_Nu8XM4VADohpQQzvOusL0q94tx9hO75CAEfyCIxSGVZP0LEriUl-nHWRRIl05Vucd1obVeQyZUgPWU94RMCiSXsikDiPwQoAbD0ACZzKW7uxfmMyENYJuOg2s35dZvUxmKtvDfsT7wS-0syMZ2XRE"
+                  mode="aspectFill"
+                ></image>
+                <view
+                  class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-surface-container-low rounded-full"
+                ></view>
+              </view>
+              <view class="flex-1">
+                <view class="flex justify-between items-start">
+                  <view class="font-bold">李师傅</view>
+                  <view class="flex items-center text-primary">
+                    <text class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1"
+                      >star</text
+                    >
+                    <text class="text-xs font-bold ml-0.5">4.8</text>
+                  </view>
+                </view>
+                <view class="text-xs text-on-surface-variant mt-0.5">距离 1.2km | 已接 1.8k 单</view>
+                <view class="mt-2 flex gap-1">
+                  <text class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">熟路</text>
+                  <text class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">服务周到</text>
+                </view>
+              </view>
+            </view>
+            <!-- Courier 3 -->
+            <view
+              class="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl hover:bg-surface-container-high transition-colors"
+            >
+              <view class="relative">
+                <image
+                  class="w-14 h-14 rounded-xl object-cover"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2uBZreSE4H06taWABfExdDNB8CD8dsOLHAtTKT8L7gtoqGub5jNm7PmBbPMrSbja2mTWbNtA_m8FT-IG8krCDpg0iEBZ9Fqzsh_0Vt2ICzO1VqBiDwE0PDzHEszjJwXrmei8X6jE6Acv7FdI7wRkElMrEORq9xvSboaX7tk02-ZmmN5aHRA09POGDf-qgklynI-rsEyig0lLD28Cwg9rIyH2-RIY6EWcc1w7_tEPRynyU6_zhgkwMM9TBNDTnYj92ZGTSFZevdSE"
+                  mode="aspectFill"
+                ></image>
+                <view
+                  class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-surface-container-low rounded-full"
+                ></view>
+              </view>
+              <view class="flex-1">
+                <view class="flex justify-between items-start">
+                  <view class="font-bold">赵师傅</view>
+                  <view class="flex items-center text-primary">
+                    <text class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1"
+                      >star</text
+                    >
+                    <text class="text-xs font-bold ml-0.5">5.0</text>
+                  </view>
+                </view>
+                <view class="text-xs text-on-surface-variant mt-0.5">距离 2.1km | 已接 3.2k 单</view>
+                <view class="mt-2 flex gap-1">
+                  <text class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">金牌服务</text>
+                </view>
+              </view>
+            </view>
+          </view>
+          <view
+            class="w-full mt-6 py-4 rounded-2xl border border-outline-variant text-on-surface-variant text-center font-bold text-sm hover:bg-surface-container-high transition-all"
+          >
+            查看地图上的人员
+          </view>
+        </view>
+      </view>
+      <!-- Latest Status Floating Section -->
+      <view class="mt-12 bg-surface-container-low rounded-[2rem] p-6 flex items-center justify-between">
+        <view class="flex items-center gap-4">
+          <view class="status-orb"></view>
+          <view>
+            <view class="text-sm font-bold">最近订单正在配送中</view>
+            <view class="text-xs text-on-surface-variant">文件快递 • 预计 14:35 送达</view>
+          </view>
+        </view>
+        <view class="bg-primary-fixed text-primary font-bold text-xs px-4 py-2 rounded-full"> 追踪位置 </view>
+      </view>
+    </view>
+    <!-- BottomNavBar -->
+    <view
+      class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-2 pb-6 bg-[#ffffff]/90 dark:bg-slate-950/90 backdrop-blur-2xl rounded-t-[1.5rem] z-50 shadow-[0_-4px_40px_rgba(25,28,30,0.06)] border-t border-[#c4c5d7]/15"
+    >
+      <navigator
+        url="/pages/index/index"
+        open-type="switchTab"
+        hover-class="none"
+        class="flex flex-col items-center justify-center text-[#0037b0] dark:text-blue-300 bg-[#dce1ff] dark:bg-blue-900/40 rounded-2xl px-5 py-1.5 transition-all active:scale-90 duration-150"
+      >
+        <text class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1"
+          >calendar_today</text
+        >
+        <text class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">预约</text>
+      </navigator>
+      <navigator
+        url="/pages/order/order"
+        open-type="switchTab"
+        hover-class="none"
+        class="flex flex-col items-center justify-center text-[#434655] dark:text-slate-500 opacity-60 hover:bg-[#f2f4f6] dark:hover:bg-slate-800 rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-150"
+      >
+        <text class="material-symbols-outlined text-[20px]">receipt_long</text>
+        <text class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">订单</text>
+      </navigator>
+      <navigator
+        url="/pages/my/my"
+        open-type="switchTab"
+        hover-class="none"
+        class="flex flex-col items-center justify-center text-[#434655] dark:text-slate-500 opacity-60 hover:bg-[#f2f4f6] dark:hover:bg-slate-800 rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-150"
+      >
+        <text class="material-symbols-outlined text-[20px]">person</text>
+        <text class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">我的</text>
+      </navigator>
+    </view>
+  </view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				title: 'Hello'
-			}
-		},
-		onLoad() {
+<script setup>
+import { onShow } from '@dcloudio/uni-app';
 
-		},
-		methods: {
-
-		}
-	}
+onShow(() => {
+  uni.hideTabBar({
+    animation: false,
+  });
+});
 </script>
 
-<style>
-	.content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.logo {
-		height: 200rpx;
-		width: 200rpx;
-		margin-top: 200rpx;
-		margin-left: auto;
-		margin-right: auto;
-		margin-bottom: 50rpx;
-	}
-
-	.text-area {
-		display: flex;
-		justify-content: center;
-	}
-
-	.title {
-		font-size: 36rpx;
-		color: #8f8f94;
-	}
+<style scoped>
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-family: 'Material Symbols Outlined';
+}
+.status-orb {
+  width: 8px;
+  height: 8px;
+  background-color: #0037b0;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 4px rgba(0, 55, 176, 0.15);
+}
 </style>

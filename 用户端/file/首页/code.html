@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Urban Architect - 预约首页</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#191c1e",
+                        "secondary": "#4d5b94",
+                        "on-primary-container": "#cad3ff",
+                        "error": "#ba1a1a",
+                        "outline": "#747686",
+                        "surface": "#f7f9fb",
+                        "secondary-fixed-dim": "#b7c4ff",
+                        "on-tertiary-fixed": "#390c00",
+                        "primary-fixed": "#dce1ff",
+                        "on-secondary-fixed": "#03164d",
+                        "secondary-fixed": "#dce1ff",
+                        "outline-variant": "#c4c5d7",
+                        "background": "#f7f9fb",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001551",
+                        "on-background": "#191c1e",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary-container": "#a73400",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary-fixed-variant": "#35437b",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary-fixed-variant": "#832700",
+                        "secondary-container": "#b0befe",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-surface-variant": "#434655",
+                        "primary-container": "#1d4ed8",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#7f2500",
+                        "primary": "#0037b0",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container": "#eceef0",
+                        "surface-variant": "#e0e3e5",
+                        "surface-tint": "#2151da",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#b7c4ff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#0039b5",
+                        "on-secondary-container": "#3d4c83",
+                        "on-tertiary-container": "#ffc9b7",
+                        "tertiary-fixed-dim": "#ffb59c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .status-orb {
+            width: 8px;
+            height: 8px;
+            background-color: #0037b0;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 4px rgba(0, 55, 176, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f7f9fb]/80 dark:bg-slate-900/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#0037b0] dark:text-blue-400">menu</span>
+<span class="text-xl font-extrabold tracking-tighter text-[#0037b0] dark:text-blue-400 font-['Plus_Jakarta_Sans']">Urban Architect</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex gap-6 mr-6">
+<a class="text-[#0037b0] dark:text-blue-400 font-semibold transition-opacity hover:opacity-80" href="#">首页</a>
+<a class="text-[#434655] dark:text-slate-400 font-semibold transition-opacity hover:opacity-80" href="#">服务</a>
+<a class="text-[#434655] dark:text-slate-400 font-semibold transition-opacity hover:opacity-80" href="#">关于</a>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="professional male portrait with friendly expression in high-key studio lighting with soft blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9sve-wEPYIXTF7DfqPPa6qc_CVthX1AD85b2vPbjr_EeY6f30aVJSLvhl4yEjvTjT-kL3t6197LbZxDwUEYuNhbExJB29v5Q77_Ikt6pUDc5nxWLtASOOEnk5a3hsiv7BjeIGZGz5-RnSv5gHwu-v6cAnIdgfLqFqKmEG04aAkkSiR3gepSn6x_o0azAZjf4Ylad6CuDvEYp1d0ehXnaR5SyTQhUXlM_CA0DfpjAADEqk1Ojti5mM0zvp4E2_JokO0kNniTqJfyQ"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-32 px-6 max-w-7xl mx-auto">
+<!-- Hero Search Section -->
+<header class="mb-10">
+<h1 class="text-4xl md:text-5xl font-bold tracking-tight text-on-surface mb-4">
+                欢迎回来，<span class="text-primary">张先生</span>
+</h1>
+<p class="text-on-surface-variant text-lg max-w-2xl mb-8">
+                您的城市生活建筑师。无论买、送、办，我们随时待命。
+            </p>
+<div class="relative group max-w-3xl">
+<div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-primary">search</span>
+</div>
+<input class="w-full bg-surface-container-high border-none rounded-2xl py-5 pl-14 pr-6 focus:ring-2 focus:ring-primary/20 transition-all text-on-surface placeholder:text-on-surface-variant/60" placeholder="搜寻附近的服务或快递员..." type="text"/>
+</div>
+</header>
+<!-- 2x2 Bento Grid Services -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+<!-- 帮我买 -->
+<div class="group relative overflow-hidden bg-surface-container-low rounded-[2rem] p-6 transition-all hover:bg-surface-container-lowest hover:shadow-xl hover:shadow-primary/5 cursor-pointer">
+<div class="mb-8 w-12 h-12 bg-primary-fixed rounded-2xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+</div>
+<h3 class="text-xl font-bold mb-2">帮我买</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">餐饮、生鲜、药品<br/>30分钟送达</p>
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">shopping_cart</span>
+</div>
+</div>
+<!-- 帮我送 -->
+<div class="group relative overflow-hidden bg-surface-container-low rounded-[2rem] p-6 transition-all hover:bg-surface-container-lowest hover:shadow-xl hover:shadow-primary/5 cursor-pointer">
+<div class="mb-8 w-12 h-12 bg-secondary-container rounded-2xl flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<h3 class="text-xl font-bold mb-2">帮我送</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">急件、鲜花、蛋糕<br/>全城专人直送</p>
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">package_2</span>
+</div>
+</div>
+<!-- 帮我办 -->
+<div class="group relative overflow-hidden bg-surface-container-low rounded-[2rem] p-6 transition-all hover:bg-surface-container-lowest hover:shadow-xl hover:shadow-primary/5 cursor-pointer">
+<div class="mb-8 w-12 h-12 bg-tertiary-fixed rounded-2xl flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">assignment</span>
+</div>
+<h3 class="text-xl font-bold mb-2">帮我办</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">排队、挂号、代取<br/>节省您的每一分钟</p>
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">task</span>
+</div>
+</div>
+<!-- 万能帮 -->
+<div class="group relative overflow-hidden bg-primary-container rounded-[2rem] p-6 transition-all hover:shadow-xl hover:shadow-primary/20 cursor-pointer">
+<div class="mb-8 w-12 h-12 bg-on-primary-container rounded-2xl flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<h3 class="text-xl font-bold mb-2 text-white">万能帮</h3>
+<p class="text-sm text-on-primary-container leading-relaxed">各种个性化需求<br/>只有想不到，没有做不到</p>
+<div class="absolute -right-4 -bottom-4 opacity-20 group-hover:opacity-30 transition-opacity">
+<span class="material-symbols-outlined text-[120px] text-white">magic_button</span>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Quick Order Section -->
+<section class="lg:col-span-2">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-bold tracking-tight">快速预约</h2>
+<button class="text-primary font-semibold text-sm flex items-center gap-1">
+                        历史地址 <span class="material-symbols-outlined text-sm">history</span>
+</button>
+</div>
+<div class="bg-surface-container-lowest rounded-[2rem] p-8 space-y-6 shadow-sm border border-outline-variant/10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface-variant ml-1">取货地址</label>
+<div class="flex items-center bg-surface-container rounded-2xl px-4 py-4">
+<span class="material-symbols-outlined text-primary mr-3">location_on</span>
+<input class="bg-transparent border-none p-0 w-full focus:ring-0 text-sm font-medium" type="text" value="北京市朝阳区三里屯SOHO 5号楼"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-on-surface-variant ml-1">收货地址</label>
+<div class="flex items-center bg-surface-container rounded-2xl px-4 py-4">
+<span class="material-symbols-outlined text-tertiary mr-3">near_me</span>
+<input class="bg-transparent border-none p-0 w-full focus:ring-0 text-sm font-medium" placeholder="输入收货地址..." type="text"/>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap gap-3">
+<span class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-primary-fixed hover:text-primary transition-colors">手机数码</span>
+<span class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-primary-fixed hover:text-primary transition-colors">文件合同</span>
+<span class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-primary-fixed hover:text-primary transition-colors">钥匙配饰</span>
+<span class="px-4 py-2 bg-surface-container-high rounded-full text-xs font-bold text-on-surface-variant cursor-pointer hover:bg-primary-fixed hover:text-primary transition-colors">+ 自定义物品</span>
+</div>
+<button class="w-full bg-primary py-5 rounded-2xl text-white font-bold text-lg hover:bg-primary-container transition-all active:scale-[0.98]">
+                        立即呼叫服务
+                    </button>
+</div>
+</section>
+<!-- Nearby Couriers -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-bold tracking-tight">附近跑男</h2>
+<span class="text-xs font-bold text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">12人在线</span>
+</div>
+<div class="space-y-4">
+<!-- Courier 1 -->
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl hover:bg-surface-container-high transition-colors">
+<div class="relative">
+<img class="w-14 h-14 rounded-xl object-cover" data-alt="close-up of smiling middle-aged delivery man wearing blue polo shirt and cap in bright daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9s1Q218GYts49tw3dJdDAKx_WFhr3j0PrdPyFp6BytJmk3GosTQJpd1I2l_-gBm_BXSqXp-zlt8WBBI95tZqlW4-o7aEPnjqRhwkjAO0wTeH44IkWPK8NsQd1bYaCfMns92TCbuCVSbdCrrHcdO6Kr9KmY8CiI55DooLTNPTb1PX2bPSCblUp2JydgsELXMspLNj4_n9pdLbWaP3N1TbbyeFCeQ0MOvkMhm8fH3hF6chby3u4bWP4zur-kKg5qi9wWS56QAAOtis"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold">王师傅</h4>
+<div class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold ml-0.5">4.9</span>
+</div>
+</div>
+<p class="text-xs text-on-surface-variant mt-0.5">距离 500m | 已接 2.4k 单</p>
+<div class="mt-2 flex gap-1">
+<span class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">准时达</span>
+<span class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">好评如潮</span>
+</div>
+</div>
+</div>
+<!-- Courier 2 -->
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl hover:bg-surface-container-high transition-colors">
+<div class="relative">
+<img class="w-14 h-14 rounded-xl object-cover" data-alt="portrait of a energetic young professional courier smiling confidently outdoors with city street background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApwY8seJM0qJvyBT-hjf1syEYderUuCTXD90H_cqEizaCs0kuv7UU4cF3YF1ltllN5ttjClcNLcrF-mjAav9Z-vE5Sg7HFUOrOK2KXrYp7b7O5h3hh2ZnAK_Nu8XM4VADohpQQzvOusL0q94tx9hO75CAEfyCIxSGVZP0LEriUl-nHWRRIl05Vucd1obVeQyZUgPWU94RMCiSXsikDiPwQoAbD0ACZzKW7uxfmMyENYJuOg2s35dZvUxmKtvDfsT7wS-0syMZ2XRE"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold">李师傅</h4>
+<div class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold ml-0.5">4.8</span>
+</div>
+</div>
+<p class="text-xs text-on-surface-variant mt-0.5">距离 1.2km | 已接 1.8k 单</p>
+<div class="mt-2 flex gap-1">
+<span class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">熟路</span>
+<span class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">服务周到</span>
+</div>
+</div>
+</div>
+<!-- Courier 3 -->
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl hover:bg-surface-container-high transition-colors">
+<div class="relative">
+<img class="w-14 h-14 rounded-xl object-cover" data-alt="friendly delivery person in city urban environment with daylight and soft focus background architecture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2uBZreSE4H06taWABfExdDNB8CD8dsOLHAtTKT8L7gtoqGub5jNm7PmBbPMrSbja2mTWbNtA_m8FT-IG8krCDpg0iEBZ9Fqzsh_0Vt2ICzO1VqBiDwE0PDzHEszjJwXrmei8X6jE6Acv7FdI7wRkElMrEORq9xvSboaX7tk02-ZmmN5aHRA09POGDf-qgklynI-rsEyig0lLD28Cwg9rIyH2-RIY6EWcc1w7_tEPRynyU6_zhgkwMM9TBNDTnYj92ZGTSFZevdSE"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h4 class="font-bold">赵师傅</h4>
+<div class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-xs font-bold ml-0.5">5.0</span>
+</div>
+</div>
+<p class="text-xs text-on-surface-variant mt-0.5">距离 2.1km | 已接 3.2k 单</p>
+<div class="mt-2 flex gap-1">
+<span class="text-[10px] bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded">金牌服务</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-4 rounded-2xl border border-outline-variant text-on-surface-variant font-bold text-sm hover:bg-surface-container-high transition-all">
+                    查看地图上的人员
+                </button>
+</section>
+</div>
+<!-- Latest Status Floating Section -->
+<section class="mt-12 bg-surface-container-low rounded-[2rem] p-6 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="status-orb"></div>
+<div>
+<h5 class="text-sm font-bold">最近订单正在配送中</h5>
+<p class="text-xs text-on-surface-variant">文件快递 • 预计 14:35 送达</p>
+</div>
+</div>
+<button class="bg-primary-fixed text-primary font-bold text-xs px-4 py-2 rounded-full">
+                追踪位置
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-2 pb-6 bg-[#ffffff]/90 dark:bg-slate-950/90 backdrop-blur-2xl rounded-t-[1.5rem] z-50 shadow-[0_-4px_40px_rgba(25,28,30,0.06)] border-t border-[#c4c5d7]/15">
+<a class="flex flex-col items-center justify-center text-[#0037b0] dark:text-blue-300 bg-[#dce1ff] dark:bg-blue-900/40 rounded-2xl px-5 py-1.5 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold">预约</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#434655] dark:text-slate-500 opacity-60 hover:bg-[#f2f4f6] dark:hover:bg-slate-800 rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold">订单</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#434655] dark:text-slate-500 opacity-60 hover:bg-[#f2f4f6] dark:hover:bg-slate-800 rounded-xl px-5 py-1.5 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold">我的</span>
+</a>
+</nav>
+</body></html>

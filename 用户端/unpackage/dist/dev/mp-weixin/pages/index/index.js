@@ -1,22 +1,2 @@
-"use strict";
-const common_vendor = require("../../common/vendor.js");
-const common_assets = require("../../common/assets.js");
-const _sfc_main = {
-  data() {
-    return {
-      title: "Hello"
-    };
-  },
-  onLoad() {
-  },
-  methods: {}
-};
-function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
-  return {
-    a: common_assets._imports_0,
-    b: common_vendor.t($data.title)
-  };
-}
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render]]);
-wx.createPage(MiniProgramPage);
+"use strict";const e=require("../../common/vendor.js"),a={__name:"index",setup(r){return e.onShow(()=>{e.index.hideTabBar({animation:!1})}),(c,o)=>({})}},n=e._export_sfc(a,[["__scopeId","data-v-1cf27b2a"]]);wx.createPage(n);
 //# sourceMappingURL=../../../.sourcemap/mp-weixin/pages/index/index.js.map
