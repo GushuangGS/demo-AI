@@ -13,8 +13,8 @@ export default {
 </script>
 
 <style>
-/* @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap'); */
+@import './static/font1.css';
+@import './static/font2.css';
 
 /*每个页面公共css */
 body {

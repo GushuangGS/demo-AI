@@ -2,6 +2,9 @@
   "pages": [
     "pages/index/index",
     "pages/order/order",
+    "pages/order/detail",
+    "pages/order/service",
+    "pages/order/review",
     "pages/mine/mine"
   ],
   "window": {
