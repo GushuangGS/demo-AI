@@ -1,25 +1,36 @@
 {
+  "description": "项目配置文件。",
+  "packOptions": {
+    "ignore": []
+  },
   "setting": {
+    "urlCheck": false,
     "es6": true,
-    "postcss": true,
+    "postcss": false,
     "minified": true,
-    "uglifyFileName": false,
-    "enhance": true,
-    "packNpmRelationList": [],
-    "babelSetting": {
-      "ignore": [],
-      "disablePlugins": [],
-      "outputPath": ""
-    },
-    "useCompilerPlugins": false,
-    "minifyWXML": true
+    "newFeature": true,
+    "bigPackageSizeSupport": true
   },
   "compileType": "miniprogram",
-  "simulatorPluginLibVersion": {},
-  "packOptions": {
-    "ignore": [],
-    "include": []
-  },
+  "libVersion": "",
   "appid": "wx76499faba7653faa",
-  "editorSetting": {}
+  "projectname": "用户端",
+  "condition": {
+    "search": {
+      "current": -1,
+      "list": []
+    },
+    "conversation": {
+      "current": -1,
+      "list": []
+    },
+    "game": {
+      "current": -1,
+      "list": []
+    },
+    "miniprogram": {
+      "current": -1,
+      "list": []
+    }
+  }
 }

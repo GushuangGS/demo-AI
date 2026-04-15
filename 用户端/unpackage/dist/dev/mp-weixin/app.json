@@ -2,8 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/order/order",
-    "pages/my/my",
-    "pages/login/login"
+    "pages/mine/mine"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -12,7 +11,6 @@
     "backgroundColor": "#F8F8F8"
   },
   "tabBar": {
-    "custom": true,
     "color": "#434655",
     "selectedColor": "#0037b0",
     "backgroundColor": "#ffffff",
@@ -26,7 +24,7 @@
         "text": "订单"
       },
       {
-        "pagePath": "pages/my/my",
+        "pagePath": "pages/mine/mine",
         "text": "我的"
       }
     ]

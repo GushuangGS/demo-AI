@@ -9,7 +9,8 @@
   "work_dir": "/Users/gus/Documents/资料/跑腿demo/用户端",
   "work_dir_norm": "/Users/gus/Documents/资料/跑腿demo/用户端",
   "start_dir": "/Users/gus/Documents/资料/跑腿demo/用户端",
-  "active": true,
+  "active": false,
   "started_at": "2026-04-14 10:03:25",
-  "start_cmd": "export CCB_MANAGED=1; export CCB_PARENT_PID=9906; export CCB_RUN_DIR=/Users/gus/.cache/ccb/projects/57fe5180c6f65983; export CCB_CALLER=gemini; export PATH=/Users/gus/.local/share/codex-dual/bin:/Users/gus/.pyenv/versions/3.12.13/bin:/opt/homebrew/Cellar/pyenv/2.6.27/libexec:/opt/homebrew/Cellar/pyenv/2.6.27/plugins/python-build/bin:/Users/gus/.local/bin:/Users/gus/.pyenv/shims:/Users/gus/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/homebrew/bin:/Users/gus/.local/bin:/Users/gus/.nvm/versions/node/v22.21.1/bin; gemini"
+  "start_cmd": "export CCB_MANAGED=1; export CCB_PARENT_PID=9906; export CCB_RUN_DIR=/Users/gus/.cache/ccb/projects/57fe5180c6f65983; export CCB_CALLER=gemini; export PATH=/Users/gus/.local/share/codex-dual/bin:/Users/gus/.pyenv/versions/3.12.13/bin:/opt/homebrew/Cellar/pyenv/2.6.27/libexec:/opt/homebrew/Cellar/pyenv/2.6.27/plugins/python-build/bin:/Users/gus/.local/bin:/Users/gus/.pyenv/shims:/Users/gus/.nvm/versions/node/v22.21.1/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/homebrew/bin:/Users/gus/.local/bin:/Users/gus/.nvm/versions/node/v22.21.1/bin; gemini",
+  "ended_at": "2026-04-15 18:17:59"
 }

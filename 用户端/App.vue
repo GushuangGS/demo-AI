@@ -2,20 +2,6 @@
 export default {
   onLaunch: function () {
     console.log('App Launch');
-    // 在微信小程序中，为了保证字体的稳定性，建议将字体下载到本地或上传到您的CDN服务器
-    // uni.loadFontFace({
-    //   family: 'Material Symbols Outlined',
-    //   source:
-    //     'url("https://fonts.gstatic.com/s/materialsymbolsoutlined/v190/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHGlclq.woff2")',
-    //   success: console.log,
-    //   fail: console.error,
-    // });
-    // uni.loadFontFace({
-    //   family: 'Plus Jakarta Sans',
-    //   source: 'url("https://fonts.gstatic.com/s/plusjakartasans/v8/LDIbaALWGmRQQQbZqWLLeEK_wA_2h2yA-tY.woff2")',
-    //   success: console.log,
-    //   fail: console.error,
-    // });
   },
   onShow: function () {
     console.log('App Show');
@@ -27,6 +13,31 @@ export default {
 </script>
 
 <style>
+/* @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap'); */
+
 /*每个页面公共css */
-@import 'tailwind-input.css';
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: max(884px, 100dvh);
+}
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+.bg-glass {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.status-orb {
+  width: 8px;
+  height: 8px;
+  background-color: #0037b0;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 4px rgba(0, 55, 176, 0.15);
+}
 </style>
