@@ -3,7 +3,7 @@
     <view class="page-shell">
       <view class="top-bar">
         <view class="back-action" @click="goBack">
-          <text class="material-symbols-outlined back-icon">arrow_back</text>
+          <LocalIcon class="back-icon" name="arrow_back" />
         </view>
         <text class="top-title">评价订单</text>
         <view class="top-placeholder"></view>
@@ -20,15 +20,13 @@
         <view class="panel">
           <text class="section-title">综合评分</text>
           <view class="star-row">
-            <text
+            <LocalIcon
               v-for="star in stars"
               :key="star"
-              class="material-symbols-outlined star-icon"
+              class="star-icon"
               :class="{ 'star-icon-active': star <= rating }"
               @click="rating = star"
-            >
-              star
-            </text>
+             name="star" />
           </view>
           <text class="rating-text">{{ ratingText }}</text>
         </view>

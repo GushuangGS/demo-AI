@@ -5,6 +5,11 @@
     "pages/order/detail",
     "pages/order/service",
     "pages/order/review",
+    "pages/buy/buy",
+    "pages/buy/address",
+    "pages/send/send",
+    "pages/errand/errand",
+    "pages/all/all",
     "pages/mine/mine"
   ],
   "window": {

@@ -14,19 +14,11 @@ export default {
 
 <style>
 @import './static/font1.css';
-@import './static/font2.css';
 
 /*每个页面公共css */
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   min-height: max(884px, 100dvh);
-}
-.material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
 }
 .bg-glass {
   backdrop-filter: blur(20px);

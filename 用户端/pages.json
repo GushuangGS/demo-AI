@@ -41,6 +41,46 @@
       }
     },
     {
+      "path": "pages/buy/buy",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "帮我买"
+      }
+    },
+    {
+      "path": "pages/buy/address",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "地址管理"
+      }
+    },
+    {
+      "path": "pages/send/send",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "帮我送"
+      }
+    },
+    {
+      "path": "pages/errand/errand",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "帮我办"
+      }
+    },
+    {
+      "path": "pages/all/all",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "万能帮"
+      }
+    },
+    {
       "path": "pages/mine/mine",
       "style": {
         "navigationStyle": "custom",

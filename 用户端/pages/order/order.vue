@@ -3,7 +3,7 @@
     <view class="page-shell">
       <view class="top-bar">
         <view class="top-brand">
-          <text class="material-symbols-outlined top-icon">menu</text>
+          <LocalIcon class="top-icon" name="menu" />
           <text class="brand-name">UrbanArchitect</text>
         </view>
         <image class="top-avatar" :src="userAvatar" mode="aspectFill" />
@@ -29,12 +29,10 @@
             :class="{ 'primary-tab-active': activePrimaryTab === tab.key }"
             @click="activePrimaryTab = tab.key"
           >
-            <text
-              class="material-symbols-outlined primary-tab-icon"
+            <LocalIcon
+              class="primary-tab-icon"
               :class="{ 'primary-tab-icon-active': activePrimaryTab === tab.key }"
-            >
-              {{ tab.icon }}
-            </text>
+             :name="tab.icon" />
             <text class="primary-tab-text" :class="{ 'primary-tab-text-active': activePrimaryTab === tab.key }">
               {{ tab.label }}
             </text>
@@ -68,7 +66,7 @@
             <view class="address-list">
               <view class="address-item">
                 <view class="address-icon-wrap address-icon-wrap-blue">
-                  <text class="material-symbols-outlined address-icon">location_on</text>
+                  <LocalIcon class="address-icon" name="location_on" />
                 </view>
                 <view class="address-copy">
                   <text class="address-label">取件地址</text>
@@ -81,7 +79,7 @@
 
               <view class="address-item">
                 <view class="address-icon-wrap address-icon-wrap-warm">
-                  <text class="material-symbols-outlined address-icon">flag</text>
+                  <LocalIcon class="address-icon" name="flag" />
                 </view>
                 <view class="address-copy">
                   <text class="address-label">收件地址</text>
@@ -122,7 +120,7 @@
               <view class="globe globe-outer"></view>
               <view class="globe globe-middle"></view>
               <view class="globe globe-inner">
-                <text class="material-symbols-outlined globe-icon">local_shipping</text>
+                <LocalIcon class="globe-icon" name="local_shipping" />
               </view>
               <view class="globe-point globe-point-one"></view>
               <view class="globe-point globe-point-two"></view>
@@ -137,7 +135,7 @@
                 <view class="courier-copy">
                   <text class="courier-name">{{ activeOrder.rider.name }}</text>
                   <view class="courier-meta-line">
-                    <text class="material-symbols-outlined courier-star">star</text>
+                    <LocalIcon class="courier-star" name="star" />
                     <text class="courier-meta">{{ activeOrder.rider.rating }}</text>
                     <text class="courier-meta">{{ activeOrder.rider.completed }}</text>
                   </view>
@@ -145,7 +143,7 @@
               </view>
               <view class="courier-actions">
                 <view class="round-action" @click="showAction('联系骑手')">
-                  <text class="material-symbols-outlined round-action-icon">call</text>
+                  <LocalIcon class="round-action-icon" name="call" />
                 </view>
                 <view
                   class="round-action"
@@ -158,7 +156,7 @@
                     })
                   "
                 >
-                  <text class="material-symbols-outlined round-action-icon">chat</text>
+                  <LocalIcon class="round-action-icon" name="chat" />
                 </view>
               </view>
             </view>
@@ -181,10 +179,10 @@
           <view class="detail-grid">
             <view class="detail-card detail-address-card">
               <view class="detail-icon-box">
-                <text class="material-symbols-outlined detail-icon">location_on</text>
+                <LocalIcon class="detail-icon" name="location_on" />
               </view>
               <view class="detail-copy">
-                <text class="detail-label">送达地址</text>
+                <text class="detail-label">{{ activeOrder.addressLabel || '送达地址' }}</text>
                 <text class="detail-title">{{ activeOrder.address.title }}</text>
                 <text class="detail-desc">{{ activeOrder.address.detail }}</text>
               </view>
@@ -204,10 +202,10 @@
           <view class="goods-card">
             <view class="goods-head">
               <view>
-                <text class="goods-label">物品详情</text>
+                <text class="goods-label">{{ activeOrder.detailLabel || '物品详情' }}</text>
                 <text class="goods-title">{{ activeOrder.goods }}</text>
               </view>
-              <text class="material-symbols-outlined goods-icon">deployed_code</text>
+              <LocalIcon class="goods-icon" name="deployed_code" />
             </view>
             <button
               class="service-button"
@@ -250,7 +248,7 @@
               <view class="list-head">
                 <view class="list-head-main">
                   <view class="list-icon-box" :class="item.iconClass">
-                    <text class="material-symbols-outlined list-icon">{{ item.icon }}</text>
+                    <LocalIcon class="list-icon" :name="item.icon" />
                   </view>
                   <view class="list-head-copy">
                     <text class="list-category">{{ item.category }}</text>
@@ -282,7 +280,7 @@
             </view>
 
             <view v-if="!filteredOrders.length" class="empty-card">
-              <text class="material-symbols-outlined empty-icon">inventory_2</text>
+              <LocalIcon class="empty-icon" name="inventory_2" />
               <text class="empty-title">当前筛选下暂无订单</text>
               <text class="empty-desc">可以切换状态查看其他订单记录</text>
             </view>
@@ -294,21 +292,21 @@
     <view class="tab-bar">
       <view class="tab-item" @click="switchTab('/pages/index/index')">
         <view class="tab-icon-box">
-          <text class="material-symbols-outlined tab-icon">calendar_month</text>
+          <LocalIcon class="tab-icon" name="calendar_month" />
         </view>
         <text class="tab-text">预约</text>
       </view>
 
       <view class="tab-item tab-item-active" @click="switchTab('/pages/order/order')">
         <view class="tab-icon-box tab-icon-box-active">
-          <text class="material-symbols-outlined tab-icon">receipt_long</text>
+          <LocalIcon class="tab-icon" name="receipt_long" />
         </view>
         <text class="tab-text tab-text-active">订单</text>
       </view>
 
       <view class="tab-item" @click="switchTab('/pages/mine/mine')">
         <view class="tab-icon-box">
-          <text class="material-symbols-outlined tab-icon">person</text>
+          <LocalIcon class="tab-icon" name="person" />
         </view>
         <text class="tab-text">我的</text>
       </view>
@@ -319,8 +317,12 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { onMounted } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 
 const userAvatar = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80';
+const ORDER_REDIRECT_KEY = 'urban_architect_order_redirect';
+const ACTIVE_ORDER_STORAGE_KEY = 'urban_architect_active_order';
+const ORDER_LIST_STORAGE_KEY = 'urban_architect_order_list';
 
 const primaryTabs = [
   { key: 'pending', label: '待接单', icon: 'hourglass_top' },
@@ -349,11 +351,13 @@ const pendingOrder = {
   receiverDetail: '环贸商场',
 };
 
-const activeOrder = {
+const defaultActiveOrder = {
   eta: '预计 12:45 送达',
   orderNo: '#UA-8829-X1',
   payMethod: '微信支付',
   goods: '建筑模型耗材 x4',
+  addressLabel: '送达地址',
+  detailLabel: '物品详情',
   rider: {
     name: '张大伟',
     rating: '4.9',
@@ -380,7 +384,9 @@ const activeOrder = {
   },
 };
 
-const orderList = [
+const activeOrder = ref({ ...defaultActiveOrder });
+
+const defaultOrderList = [
   {
     orderNo: 'UA-20230914-01',
     filter: 'inProgress',
@@ -436,11 +442,15 @@ const currentPrimaryLabel = computed(() => {
   return current ? current.label : '订单';
 });
 
+const customOrderList = ref([]);
+
+const displayOrderList = computed(() => [...customOrderList.value, ...defaultOrderList]);
+
 const filteredOrders = computed(() => {
   if (activeListTab.value === 'all') {
-    return orderList;
+    return displayOrderList.value;
   }
-  return orderList.filter((item) => item.filter === activeListTab.value);
+  return displayOrderList.value.filter((item) => item.filter === activeListTab.value);
 });
 
 const showAction = (action) => {
@@ -507,6 +517,36 @@ const handleOrderAction = (item) => {
   showAction(item.actionText);
 };
 
+const syncActiveOrderFromStorage = () => {
+  const cachedScene = uni.getStorageSync(ORDER_REDIRECT_KEY);
+  const cachedOrder = uni.getStorageSync(ACTIVE_ORDER_STORAGE_KEY);
+  const cachedOrderList = uni.getStorageSync(ORDER_LIST_STORAGE_KEY);
+
+  customOrderList.value = Array.isArray(cachedOrderList) ? cachedOrderList : [];
+
+  if (cachedOrder && typeof cachedOrder === 'object' && cachedOrder.orderNo) {
+    activeOrder.value = {
+      ...defaultActiveOrder,
+      ...cachedOrder,
+      rider: {
+        ...defaultActiveOrder.rider,
+        ...(cachedOrder.rider || {}),
+      },
+      address: {
+        ...defaultActiveOrder.address,
+        ...(cachedOrder.address || {}),
+      },
+      steps: cachedOrder.steps || defaultActiveOrder.steps,
+    };
+  }
+
+  if (cachedScene === 'delivery') {
+    activePrimaryTab.value = 'delivery';
+    activeListTab.value = 'inProgress';
+    uni.removeStorageSync(ORDER_REDIRECT_KEY);
+  }
+};
+
 const confirmCancelOrder = () => {
   uni.showModal({
     title: '确认取消订单',
@@ -525,6 +565,11 @@ const confirmCancelOrder = () => {
 
 onMounted(() => {
   uni.hideTabBar();
+  syncActiveOrderFromStorage();
+});
+
+onShow(() => {
+  syncActiveOrderFromStorage();
 });
 
 const switchTab = (url) => {

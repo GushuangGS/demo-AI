@@ -3,7 +3,7 @@
     <view class="page-shell">
       <view class="top-bar">
         <view class="back-action" @click="goBack">
-          <text class="material-symbols-outlined back-icon">arrow_back</text>
+          <LocalIcon class="back-icon" name="arrow_back" />
         </view>
         <text class="top-title">联系客服</text>
         <view class="top-placeholder"></view>
@@ -37,14 +37,14 @@
             <view v-for="item in contactOptions" :key="item.title" class="menu-item" @click="handleAction(item.action)">
               <view class="menu-left">
                 <view class="menu-icon-box">
-                  <text class="material-symbols-outlined menu-icon">{{ item.icon }}</text>
+                  <LocalIcon class="menu-icon" :name="item.icon" />
                 </view>
                 <view class="menu-copy">
                   <text class="menu-title">{{ item.title }}</text>
                   <text class="menu-desc">{{ item.desc }}</text>
                 </view>
               </view>
-              <text class="material-symbols-outlined menu-arrow">chevron_right</text>
+              <LocalIcon class="menu-arrow" name="chevron_right" />
             </view>
           </view>
         </view>

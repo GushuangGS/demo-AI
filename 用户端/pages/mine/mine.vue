@@ -3,7 +3,7 @@
     <view class="page-shell">
       <view v-if="isLoggedIn" class="top-bar logged-top-bar bg-glass">
         <view class="brand-wrap">
-          <text class="material-symbols-outlined top-leading-icon">menu</text>
+          <LocalIcon class="top-leading-icon" name="menu" />
           <text class="brand-name logged-brand-name">UrbanArchitect</text>
         </view>
         <image class="top-avatar" :src="profile.avatarUrl" mode="aspectFill" />
@@ -11,10 +11,10 @@
 
       <view v-else class="top-bar bg-glass">
         <view class="brand-wrap">
-          <text class="material-symbols-outlined brand-icon">grid_view</text>
+          <LocalIcon class="brand-icon" name="grid_view" />
           <text class="brand-name">UrbanConcierge</text>
         </view>
-        <text class="material-symbols-outlined notice-icon">notifications</text>
+        <LocalIcon class="notice-icon" name="notifications" />
       </view>
 
       <view v-if="isLoggedIn" class="content logged-content">
@@ -28,7 +28,7 @@
           </view>
           <view class="profile-hero-side">
             <view class="profile-qr-box">
-              <text class="material-symbols-outlined profile-qr-icon">qr_code_2</text>
+              <LocalIcon class="profile-qr-icon" name="qr_code_2" />
             </view>
           </view>
         </view>
@@ -52,7 +52,7 @@
             <text class="balance-value">{{ profile.balance }}</text>
             <view class="balance-button">
               <text class="balance-button-text">立即充值</text>
-              <text class="material-symbols-outlined balance-button-icon">chevron_right</text>
+              <LocalIcon class="balance-button-icon" name="chevron_right" />
             </view>
             <view class="balance-bubble balance-bubble-one"></view>
             <view class="balance-bubble balance-bubble-two"></view>
@@ -61,7 +61,7 @@
           <view class="asset-side">
             <view class="benefit-card">
               <view class="benefit-card-top">
-                <text class="material-symbols-outlined benefit-icon">confirmation_number</text>
+                <LocalIcon class="benefit-icon" name="confirmation_number" />
                 <text class="benefit-pill">{{ profile.couponCount }}</text>
               </view>
               <text class="benefit-title">优惠券</text>
@@ -70,7 +70,7 @@
 
             <view class="benefit-card points-card">
               <view class="benefit-card-top">
-                <text class="material-symbols-outlined benefit-icon">stars</text>
+                <LocalIcon class="benefit-icon" name="stars" />
               </view>
               <text class="benefit-title">积分商城</text>
               <text class="benefit-desc">可用积分:{{ profile.points }}</text>
@@ -81,24 +81,24 @@
         <view class="service-section">
           <text class="service-section-title">服务 与 设置</text>
           <view class="service-panel">
-            <view v-for="item in loggedMenuItems" :key="item.title" class="service-item">
+            <view v-for="item in loggedMenuItems" :key="item.title" class="service-item" @tap="handleMenuAction(item)">
               <view class="service-item-left">
                 <view class="service-item-icon-box">
-                  <text class="material-symbols-outlined service-item-icon">{{ item.icon }}</text>
+                  <LocalIcon class="service-item-icon" :name="item.icon" />
                 </view>
                 <view class="service-item-copy">
                   <text class="service-item-title">{{ item.title }}</text>
                   <text class="service-item-desc">{{ item.desc }}</text>
                 </view>
               </view>
-              <text class="material-symbols-outlined service-item-arrow">chevron_right</text>
+              <LocalIcon class="service-item-arrow" name="chevron_right" />
             </view>
           </view>
         </view>
 
         <view class="logout-wrap">
           <view class="logout-button" @click="logout">
-            <text class="material-symbols-outlined logout-icon">logout</text>
+            <LocalIcon class="logout-icon" name="logout" />
             <text class="logout-text">退出当前账号</text>
           </view>
         </view>
@@ -112,7 +112,7 @@
             <view class="avatar-shell">
               <view class="avatar-ring">
                 <view class="avatar-core">
-                  <text class="material-symbols-outlined avatar-icon">account_circle</text>
+                  <LocalIcon class="avatar-icon" name="account_circle" />
                 </view>
               </view>
             </view>
@@ -124,9 +124,9 @@
         </view>
 
         <view class="feature-grid">
-          <view v-for="item in featureCards" :key="item.title" class="feature-card">
+          <view v-for="item in featureCards" :key="item.title" class="feature-card" @tap="handleMenuAction(item)">
             <view class="feature-icon-box">
-              <text class="material-symbols-outlined feature-icon">{{ item.icon }}</text>
+              <LocalIcon class="feature-icon" :name="item.icon" />
             </view>
             <view class="feature-copy">
               <text class="feature-title">{{ item.title }}</text>
@@ -136,9 +136,9 @@
         </view>
 
         <view class="quick-actions">
-          <view v-for="item in quickActions" :key="item.title" class="quick-action">
+          <view v-for="item in quickActions" :key="item.title" class="quick-action" @tap="handleMenuAction(item)">
             <view class="quick-action-icon-box">
-              <text class="material-symbols-outlined quick-action-icon">{{ item.icon }}</text>
+              <LocalIcon class="quick-action-icon" :name="item.icon" />
             </view>
             <text class="quick-action-title">{{ item.title }}</text>
           </view>
@@ -163,11 +163,11 @@
           <view v-for="item in menuItems" :key="item.title" class="menu-item">
             <view class="menu-item-left">
               <view class="menu-icon-box">
-                <text class="material-symbols-outlined menu-icon">{{ item.icon }}</text>
+                <LocalIcon class="menu-icon" :name="item.icon" />
               </view>
               <text class="menu-title">{{ item.title }}</text>
             </view>
-            <text class="material-symbols-outlined menu-arrow">chevron_right</text>
+            <LocalIcon class="menu-arrow" name="chevron_right" />
           </view>
         </view>
       </view>
@@ -176,21 +176,21 @@
     <view class="tab-bar bg-glass">
       <view class="tab-item" @click="switchTab('/pages/index/index')">
         <view class="tab-icon-box">
-          <text class="material-symbols-outlined tab-icon">calendar_month</text>
+          <LocalIcon class="tab-icon" name="calendar_month" />
         </view>
         <text class="tab-text">预约</text>
       </view>
 
       <view class="tab-item" @click="switchTab('/pages/order/order')">
         <view class="tab-icon-box">
-          <text class="material-symbols-outlined tab-icon">receipt_long</text>
+          <LocalIcon class="tab-icon" name="receipt_long" />
         </view>
         <text class="tab-text">订单</text>
       </view>
 
       <view class="tab-item tab-item-active" @click="switchTab('/pages/mine/mine')">
         <view class="tab-icon-box tab-icon-box-active">
-          <text class="material-symbols-outlined tab-icon">person</text>
+          <LocalIcon class="tab-icon" name="person" />
         </view>
         <text class="tab-text tab-text-active">我的</text>
       </view>
@@ -224,6 +224,12 @@ const profile = ref({ ...defaultProfile });
 
 const featureCards = [
   {
+    title: '帮我买',
+    desc: '即时代购与送达',
+    icon: 'shopping_bag',
+    path: '/pages/buy/buy',
+  },
+  {
     title: '我的钱包',
     desc: '查看余额与权益',
     icon: 'account_balance_wallet',
@@ -236,6 +242,11 @@ const featureCards = [
 ];
 
 const quickActions = [
+  {
+    title: '帮我买',
+    icon: 'shopping_bag',
+    path: '/pages/buy/buy',
+  },
   {
     title: '客户服务',
     icon: 'support_agent',
@@ -258,6 +269,12 @@ const menuItems = [
 ];
 
 const loggedMenuItems = [
+  {
+    title: '帮我买',
+    desc: '即刻代购，高效送达',
+    icon: 'shopping_bag',
+    path: '/pages/buy/buy',
+  },
   {
     title: '系统设置',
     desc: '偏好、隐私与安全',
@@ -365,6 +382,28 @@ const logout = () => {
   loadUserProfile();
   uni.showToast({
     title: '已退出登录',
+    icon: 'none',
+  });
+};
+
+const handleMenuAction = (item) => {
+  console.log(item, 'item', item.path);
+
+  if (item.path) {
+    uni.navigateTo({
+      url: item.path,
+      fail: () => {
+        uni.showToast({
+          title: '页面跳转失败',
+          icon: 'none',
+        });
+      },
+    });
+    return;
+  }
+
+  uni.showToast({
+    title: `${item.title}功能待接入`,
     icon: 'none',
   });
 };

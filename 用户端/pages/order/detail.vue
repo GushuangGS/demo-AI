@@ -3,31 +3,31 @@
     <view class="page-shell">
       <view class="top-bar">
         <view class="back-action" @click="goBack">
-          <text class="material-symbols-outlined back-icon">arrow_back</text>
+          <LocalIcon class="back-icon" name="arrow_back" />
         </view>
         <text class="top-title">订单详情</text>
         <view class="share-action" @click="shareOrder">
-          <text class="material-symbols-outlined share-icon">share</text>
+          <LocalIcon class="share-icon" name="share" />
         </view>
       </view>
 
       <view class="content">
-        <view class="hero-card">
-          <text class="hero-status">{{ status }}</text>
-          <text class="hero-title">{{ projectName }}</text>
-          <text class="hero-desc">{{ summary }}</text>
+        <view class="hero-card" :class="heroThemeClass">
+          <text class="hero-status">{{ detailState.status }}</text>
+          <text class="hero-title">{{ detailState.title }}</text>
+          <text class="hero-desc">{{ detailState.summary }}</text>
           <view class="hero-price-row">
-            <text class="hero-price">{{ price }}</text>
-            <text class="hero-order-no">{{ orderNo }}</text>
+            <text class="hero-price">{{ detailState.price }}</text>
+            <text class="hero-order-no">{{ detailState.orderNo }}</text>
           </view>
         </view>
 
         <view class="panel">
           <text class="section-title">服务进度</text>
-          <view v-for="(step, index) in timeline" :key="step.title" class="timeline-item">
+          <view v-for="(step, index) in detailState.timeline" :key="step.title" class="timeline-item">
             <view class="timeline-side">
               <view class="timeline-dot" :class="{ 'timeline-dot-active': index === 0 }"></view>
-              <view v-if="index !== timeline.length - 1" class="timeline-line"></view>
+              <view v-if="index !== detailState.timeline.length - 1" class="timeline-line"></view>
             </view>
             <view class="timeline-copy">
               <text class="timeline-title">{{ step.title }}</text>
@@ -39,26 +39,146 @@
 
         <view class="info-grid">
           <view class="info-card info-card-wide">
-            <text class="info-label">服务地址</text>
-            <text class="info-title">{{ address }}</text>
-            <text class="info-desc">{{ contact }}</text>
+            <text class="info-label">{{ detailState.infoLabel }}</text>
+            <text class="info-title">{{ detailState.infoTitle }}</text>
+            <text class="info-desc">{{ detailState.infoDesc }}</text>
           </view>
 
           <view class="info-card">
             <text class="info-label">支付方式</text>
-            <text class="info-title">微信支付</text>
+            <text class="info-title">{{ detailState.payMethod }}</text>
           </view>
 
           <view class="info-card">
             <text class="info-label">服务人员</text>
-            <text class="info-title">{{ assignee }}</text>
+            <text class="info-title">{{ detailState.assignee }}</text>
           </view>
         </view>
 
-        <view class="panel">
+        <view v-if="detailType === 'buy'" class="panel">
+          <text class="section-title">代购详情</text>
+          <view class="summary-list">
+            <view class="summary-item">
+              <text class="summary-label">商品信息</text>
+              <text class="summary-value">{{ buySection.goodsName }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">预估价格</text>
+              <text class="summary-value">{{ buySection.goodsPrice }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">购买地址</text>
+              <text class="summary-value">{{ buySection.pickupAddress }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">收货地址</text>
+              <text class="summary-value">{{ buySection.receiverAddress }}</text>
+              <text class="summary-extra">{{ buySection.receiverContact }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">送达时间</text>
+              <text class="summary-value">{{ buySection.deliverTime }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">备注要求</text>
+              <text class="summary-value">{{ buySection.remark }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">费用说明</text>
+              <text class="summary-value">{{ buySection.feeText }}</text>
+            </view>
+          </view>
+          <image v-if="buySection.imageUrl" class="detail-image" :src="buySection.imageUrl" mode="aspectFill" />
+        </view>
+
+        <view v-else-if="detailType === 'send'" class="panel">
+          <text class="section-title">寄送详情</text>
+          <view class="summary-list">
+            <view class="summary-item">
+              <text class="summary-label">寄送物品</text>
+              <text class="summary-value">{{ sendSection.itemName }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">物品说明</text>
+              <text class="summary-value">{{ sendSection.itemRemark }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">取件地址</text>
+              <text class="summary-value">{{ sendSection.pickupAddress }}</text>
+              <text class="summary-extra">{{ sendSection.pickupContact }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">收件地址</text>
+              <text class="summary-value">{{ sendSection.receiverAddress }}</text>
+              <text class="summary-extra">{{ sendSection.receiverContact }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">配送时效</text>
+              <text class="summary-value">{{ sendSection.deliverySpeed }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">保价服务</text>
+              <text class="summary-value">{{ sendSection.insurance }}</text>
+            </view>
+          </view>
+        </view>
+
+        <view v-else-if="detailType === 'errand'" class="panel">
+          <text class="section-title">代办详情</text>
+          <view class="summary-list">
+            <view class="summary-item">
+              <text class="summary-label">代办类型</text>
+              <text class="summary-value">{{ errandSection.taskType }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">任务说明</text>
+              <text class="summary-value">{{ errandSection.taskDesc }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">期望时间</text>
+              <text class="summary-value">{{ errandSection.taskTime }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">优先级</text>
+              <text class="summary-value">{{ errandSection.priority }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">预算范围</text>
+              <text class="summary-value">{{ errandSection.budget }}</text>
+            </view>
+          </view>
+        </view>
+
+        <view v-else-if="detailType === 'all'" class="panel">
+          <text class="section-title">需求详情</text>
+          <view class="summary-list">
+            <view class="summary-item">
+              <text class="summary-label">需求类型</text>
+              <text class="summary-value">{{ allSection.sceneText }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">详细需求</text>
+              <text class="summary-value">{{ allSection.requirement }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">期望完成时间</text>
+              <text class="summary-value">{{ allSection.deadline }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">预算范围</text>
+              <text class="summary-value">{{ allSection.budget }}</text>
+            </view>
+            <view class="summary-item">
+              <text class="summary-label">平台建议</text>
+              <text class="summary-value">{{ allSection.suggestion }}</text>
+            </view>
+          </view>
+        </view>
+
+        <view v-else class="panel">
           <text class="section-title">服务内容</text>
           <view class="summary-list">
-            <view v-for="item in detailList" :key="item.label" class="summary-item">
+            <view v-for="item in genericList" :key="item.label" class="summary-item">
               <text class="summary-label">{{ item.label }}</text>
               <text class="summary-value">{{ item.value }}</text>
             </view>
@@ -75,48 +195,97 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, reactive } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
+import { getOrderRecordByNo } from '../../utils/order-store';
 
-const orderNo = ref('UA-20230914-01');
-const status = ref('进行中');
-const projectName = ref('滨海别墅概念方案');
-const price = ref('¥12,800.00');
-const summary = ref('包含平面布局、3D 建模及初步材料建议');
-const address = ref('静安区南京西路 1601 号，越洋广场 28 楼');
-const contact = ref('联系人：张女士 138****8888');
-const assignee = ref('主案建筑师 刘工');
+const detailState = reactive({
+  orderNo: 'UA-20230914-01',
+  status: '进行中',
+  title: '滨海别墅概念方案',
+  price: '¥12,800.00',
+  summary: '包含平面布局、3D 建模及初步材料建议',
+  payMethod: '微信支付',
+  assignee: '主案建筑师 刘工',
+  infoLabel: '服务地址',
+  infoTitle: '静安区南京西路 1601 号，越洋广场 28 楼',
+  infoDesc: '联系人：张女士 138****8888',
+  type: 'generic',
+  timeline: [
+    { title: '需求已确认', desc: '服务内容和交付时间已锁定', time: '04-14 10:20' },
+    { title: '方案设计中', desc: '设计师正在整理概念稿与空间建议', time: '04-15 14:10' },
+    { title: '待您确认', desc: '初稿完成后会通过站内消息同步', time: '预计 04-18' },
+  ],
+});
 
-const timeline = ref([
-  {
-    title: '需求已确认',
-    desc: '服务内容和交付时间已锁定',
-    time: '04-14 10:20',
-  },
-  {
-    title: '方案设计中',
-    desc: '设计师正在整理概念稿与空间建议',
-    time: '04-15 14:10',
-  },
-  {
-    title: '待您确认',
-    desc: '初稿完成后会通过站内消息同步',
-    time: '预计 04-18',
-  },
-]);
+const sectionsState = reactive({
+  buy: {},
+  send: {},
+  errand: {},
+  all: {},
+  generic: [
+    { label: '订单类型', value: '空间规划设计' },
+    { label: '交付形式', value: '线上方案 + PDF 文件' },
+    { label: '预计交付', value: '2026-04-18 18:00' },
+    { label: '备注信息', value: '偏好现代极简风格，关注采光与动线' },
+  ],
+});
 
-const detailList = ref([
-  { label: '订单类型', value: '空间规划设计' },
-  { label: '交付形式', value: '线上方案 + PDF 文件' },
-  { label: '预计交付', value: '2026-04-18 18:00' },
-  { label: '备注信息', value: '偏好现代极简风格，关注采光与动线' },
-]);
+const detailType = computed(() => detailState.type || 'generic');
+const buySection = computed(() => sectionsState.buy || {});
+const sendSection = computed(() => sectionsState.send || {});
+const errandSection = computed(() => sectionsState.errand || {});
+const allSection = computed(() => sectionsState.all || {});
+const genericList = computed(() => sectionsState.generic || []);
+
+const heroThemeClass = computed(() => {
+  const map = {
+    buy: 'hero-theme-buy',
+    send: 'hero-theme-send',
+    errand: 'hero-theme-errand',
+    all: 'hero-theme-all',
+  };
+  return map[detailType.value] || 'hero-theme-generic';
+});
+
+const applyOrderRecord = (record, fallbackOptions) => {
+  if (!record) {
+    detailState.orderNo = fallbackOptions.orderNo || detailState.orderNo;
+    detailState.status = fallbackOptions.status || detailState.status;
+    detailState.title = fallbackOptions.projectName || detailState.title;
+    detailState.price = fallbackOptions.price || detailState.price;
+    return;
+  }
+
+  const payload = record.detailPayload || {};
+  detailState.orderNo = record.orderNo;
+  detailState.status = payload.status || record.listItem?.statusLabel || detailState.status;
+  detailState.title = payload.title || record.listItem?.projectName || detailState.title;
+  detailState.price = payload.price || record.listItem?.price || detailState.price;
+  detailState.summary = payload.summary || record.listItem?.projectDesc || detailState.summary;
+  detailState.payMethod = payload.payMethod || record.activeOrder?.payMethod || detailState.payMethod;
+  detailState.assignee = payload.assignee || record.activeOrder?.rider?.name || detailState.assignee;
+  detailState.infoLabel = record.activeOrder?.addressLabel || '服务信息';
+  detailState.infoTitle = record.activeOrder?.address?.title || detailState.infoTitle;
+  detailState.infoDesc = record.activeOrder?.address?.detail || detailState.infoDesc;
+  detailState.type = record.type || 'generic';
+  detailState.timeline = payload.timeline?.length ? payload.timeline : detailState.timeline;
+
+  sectionsState.buy = payload.sections?.buy || {};
+  sectionsState.send = payload.sections?.send || {};
+  sectionsState.errand = payload.sections?.errand || {};
+  sectionsState.all = payload.sections?.all || {};
+};
 
 onLoad((options) => {
-  orderNo.value = options?.orderNo || orderNo.value;
-  status.value = options?.status || status.value;
-  projectName.value = options?.projectName || projectName.value;
-  price.value = options?.price || price.value;
+  const orderNo = options?.orderNo || detailState.orderNo;
+  const orderRecord = getOrderRecordByNo(orderNo);
+  applyOrderRecord(orderRecord, {
+    orderNo,
+    status: options?.status,
+    projectName: options?.projectName,
+    price: options?.price,
+  });
 });
 
 const goBack = () => {
@@ -133,16 +302,16 @@ const shareOrder = () => {
 const goService = () => {
   uni.navigateTo({
     url: `/pages/order/service?source=${encodeURIComponent('订单详情')}&orderNo=${encodeURIComponent(
-      orderNo.value
-    )}&projectName=${encodeURIComponent(projectName.value)}&status=${encodeURIComponent(status.value)}`,
+      detailState.orderNo,
+    )}&projectName=${encodeURIComponent(detailState.title)}&status=${encodeURIComponent(detailState.status)}`,
   });
 };
 
 const goReview = () => {
   uni.navigateTo({
-    url: `/pages/order/review?orderNo=${encodeURIComponent(orderNo.value)}&projectName=${encodeURIComponent(
-      projectName.value
-    )}&status=${encodeURIComponent(status.value)}&price=${encodeURIComponent(price.value)}`,
+    url: `/pages/order/review?orderNo=${encodeURIComponent(detailState.orderNo)}&projectName=${encodeURIComponent(
+      detailState.title,
+    )}&status=${encodeURIComponent(detailState.status)}&price=${encodeURIComponent(detailState.price)}`,
   });
 };
 </script>
@@ -212,6 +381,26 @@ const goReview = () => {
 
 .hero-card {
   padding: 22px 20px;
+  background: linear-gradient(180deg, #1f4fd8 0%, #123dc2 100%);
+}
+
+.hero-theme-buy {
+  background: linear-gradient(180deg, #1f4fd8 0%, #123dc2 100%);
+}
+
+.hero-theme-send {
+  background: linear-gradient(180deg, #3455d7 0%, #233eb4 100%);
+}
+
+.hero-theme-errand {
+  background: linear-gradient(180deg, #4d43d8 0%, #3423b4 100%);
+}
+
+.hero-theme-all {
+  background: linear-gradient(180deg, #1565c4 0%, #0f49a7 100%);
+}
+
+.hero-theme-generic {
   background: linear-gradient(180deg, #1f4fd8 0%, #123dc2 100%);
 }
 
@@ -384,6 +573,21 @@ const goReview = () => {
 .summary-item + .summary-item {
   padding-top: 16px;
   border-top: 1px solid #eceef2;
+}
+
+.summary-extra {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6f7686;
+}
+
+.detail-image {
+  width: 100%;
+  height: 180px;
+  margin-top: 18px;
+  border-radius: 18px;
 }
 
 .action-row {

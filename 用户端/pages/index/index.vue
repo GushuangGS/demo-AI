@@ -19,7 +19,7 @@
           <text class="hero-subtitle">您的城市生活建筑师。无论买、送、办，我们随时待命。</text>
 
           <view class="search-box">
-            <text class="material-symbols-outlined search-icon">search</text>
+            <LocalIcon class="search-icon" name="search" />
             <input class="search-input" placeholder="搜寻附近的服务或快递员..." type="text" />
           </view>
         </view>
@@ -29,10 +29,11 @@
             v-for="item in services"
             :key="item.title"
             class="service-card"
-            :class="item.cardClass"
+            :class="[item.cardClass, { 'service-card-active': activeService?.title === item.title }]"
+            @tap="handleServiceCardTap(item)"
           >
             <view class="service-icon-box" :class="item.iconClass">
-              <text class="material-symbols-outlined service-icon">{{ item.icon }}</text>
+              <LocalIcon class="service-icon" :name="item.icon" />
             </view>
             <text class="service-title" :class="{ 'service-title-light': item.highlight }">
               {{ item.title }}
@@ -45,12 +46,7 @@
                 {{ item.descBottom }}
               </text>
             </view>
-            <text
-              class="material-symbols-outlined service-mark"
-              :class="{ 'service-mark-light': item.highlight }"
-            >
-              {{ item.bgIcon }}
-            </text>
+            <LocalIcon class="service-mark" :class="{ 'service-mark-light': item.highlight }" :name="item.bgIcon" />
           </view>
         </view>
 
@@ -59,7 +55,7 @@
             <text class="section-title">快速预约</text>
             <view class="section-link">
               <text class="section-link-text">历史地址</text>
-              <text class="material-symbols-outlined section-link-icon">history</text>
+              <LocalIcon class="section-link-icon" name="history" />
             </view>
           </view>
 
@@ -67,7 +63,7 @@
             <view class="field-group">
               <text class="field-label">取货地址</text>
               <view class="field-box">
-                <text class="material-symbols-outlined field-icon field-icon-primary">location_on</text>
+                <LocalIcon class="field-icon field-icon-primary" name="location_on" />
                 <input class="field-input" type="text" value="北京市朝阳区三里屯SOHO 5号楼" />
               </view>
             </view>
@@ -75,7 +71,7 @@
             <view class="field-group field-group-gap">
               <text class="field-label">收货地址</text>
               <view class="field-box">
-                <text class="material-symbols-outlined field-icon field-icon-tertiary">near_me</text>
+                <LocalIcon class="field-icon field-icon-tertiary" name="near_me" />
                 <input class="field-input" placeholder="输入收货地址..." type="text" />
               </view>
             </view>
@@ -84,7 +80,7 @@
               <text v-for="tag in orderTags" :key="tag" class="tag-chip">{{ tag }}</text>
             </view>
 
-            <button class="primary-button">立即呼叫服务</button>
+            <button class="primary-button" @tap="handlePrimaryBooking">立即呼叫服务</button>
           </view>
         </view>
 
@@ -106,7 +102,7 @@
                   <view class="courier-topline">
                     <text class="courier-name">{{ courier.name }}</text>
                     <view class="courier-rating">
-                      <text class="material-symbols-outlined courier-star">star</text>
+                      <LocalIcon class="courier-star" name="star" />
                       <text class="courier-score">{{ courier.score }}</text>
                     </view>
                   </view>
@@ -138,21 +134,21 @@
     <view class="tab-bar bg-glass">
       <view class="tab-item tab-item-active" @click="switchTab('/pages/index/index')">
         <view class="tab-icon-box tab-icon-box-active">
-          <text class="material-symbols-outlined tab-icon">calendar_month</text>
+          <LocalIcon class="tab-icon" name="calendar_month" />
         </view>
         <text class="tab-text tab-text-active">预约</text>
       </view>
 
       <view class="tab-item" @click="switchTab('/pages/order/order')">
         <view class="tab-icon-box">
-          <text class="material-symbols-outlined tab-icon">receipt_long</text>
+          <LocalIcon class="tab-icon" name="receipt_long" />
         </view>
         <text class="tab-text">订单</text>
       </view>
 
       <view class="tab-item" @click="switchTab('/pages/mine/mine')">
         <view class="tab-icon-box">
-          <text class="material-symbols-outlined tab-icon">person</text>
+          <LocalIcon class="tab-icon" name="person" />
         </view>
         <text class="tab-text">我的</text>
       </view>
@@ -161,7 +157,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const services = [
   {
@@ -173,6 +169,7 @@ const services = [
     cardClass: 'service-card-buy',
     iconClass: 'service-icon-buy',
     highlight: false,
+    path: '/pages/buy/buy',
   },
   {
     title: '帮我送',
@@ -183,6 +180,7 @@ const services = [
     cardClass: 'service-card-send',
     iconClass: 'service-icon-send',
     highlight: false,
+    path: '/pages/send/send',
   },
   {
     title: '帮我办',
@@ -193,6 +191,7 @@ const services = [
     cardClass: 'service-card-do',
     iconClass: 'service-icon-do',
     highlight: false,
+    path: '/pages/errand/errand',
   },
   {
     title: '万能帮',
@@ -203,8 +202,12 @@ const services = [
     cardClass: 'service-card-all',
     iconClass: 'service-icon-all',
     highlight: true,
+    path: '/pages/all/all',
   },
 ];
+
+const activeServiceTitle = ref('帮我买');
+const activeService = computed(() => services.find((item) => item.title === activeServiceTitle.value) || services[0]);
 
 const orderTags = ['手机数码', '文件合同', '钥匙配饰', '+ 自定义物品'];
 
@@ -238,6 +241,35 @@ const couriers = [
 onMounted(() => {
   uni.hideTabBar();
 });
+
+const handleServiceCardTap = (item) => {
+  activeServiceTitle.value = item.title;
+  handleServiceAction(item);
+};
+
+const handlePrimaryBooking = () => {
+  handleServiceAction(activeService.value);
+};
+
+const handleServiceAction = (item) => {
+  if (item.path) {
+    uni.navigateTo({
+      url: item.path,
+      fail: () => {
+        uni.showToast({
+          title: '页面跳转失败',
+          icon: 'none',
+        });
+      },
+    });
+    return;
+  }
+
+  uni.showToast({
+    title: `${item.title}功能待接入`,
+    icon: 'none',
+  });
+};
 
 const switchTab = (url) => {
   uni.switchTab({ url });
@@ -358,6 +390,11 @@ const switchTab = (url) => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
+
+.service-card-active {
+  outline: 2px solid rgba(28, 71, 214, 0.18);
+  box-shadow: 0 12px 24px rgba(28, 71, 214, 0.08);
 }
 
 .service-card-buy,
