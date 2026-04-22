@@ -199,25 +199,25 @@ import LocalIcon from '@/components/LocalIcon.vue';
 
 import { computed, reactive } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { getOrderRecordByNo } from '../../utils/order-store';
+import { fetchOrderDetail } from '../../api/order';
 
 const detailState = reactive({
-  orderNo: 'UA-20230914-01',
-  status: '进行中',
-  title: '滨海别墅概念方案',
-  price: '¥12,800.00',
-  summary: '包含平面布局、3D 建模及初步材料建议',
-  payMethod: '微信支付',
-  assignee: '主案建筑师 刘工',
-  infoLabel: '服务地址',
-  infoTitle: '静安区南京西路 1601 号，越洋广场 28 楼',
-  infoDesc: '联系人：张女士 138****8888',
-  type: 'generic',
-  timeline: [
-    { title: '需求已确认', desc: '服务内容和交付时间已锁定', time: '04-14 10:20' },
-    { title: '方案设计中', desc: '设计师正在整理概念稿与空间建议', time: '04-15 14:10' },
-    { title: '待您确认', desc: '初稿完成后会通过站内消息同步', time: '预计 04-18' },
-  ],
+  // orderNo: 'UA-20230914-01',
+  // status: '进行中',
+  // title: '滨海别墅概念方案',
+  // price: '¥12,800.00',
+  // summary: '包含平面布局、3D 建模及初步材料建议',
+  // payMethod: '微信支付',
+  // assignee: '主案建筑师 刘工',
+  // infoLabel: '服务地址',
+  // infoTitle: '静安区南京西路 1601 号，越洋广场 28 楼',
+  // infoDesc: '联系人：张女士 138****8888',
+  // type: 'generic',
+  // timeline: [
+  //   { title: '需求已确认', desc: '服务内容和交付时间已锁定', time: '04-14 10:20' },
+  //   { title: '方案设计中', desc: '设计师正在整理概念稿与空间建议', time: '04-15 14:10' },
+  //   { title: '待您确认', desc: '初稿完成后会通过站内消息同步', time: '预计 04-18' },
+  // ],
 });
 
 const sectionsState = reactive({
@@ -250,7 +250,7 @@ const heroThemeClass = computed(() => {
   return map[detailType.value] || 'hero-theme-generic';
 });
 
-const applyOrderRecord = (record, fallbackOptions) => {
+const applyOrderRecord = (record, fallbackOptions = {}) => {
   if (!record) {
     detailState.orderNo = fallbackOptions.orderNo || detailState.orderNo;
     detailState.status = fallbackOptions.status || detailState.status;
@@ -259,46 +259,87 @@ const applyOrderRecord = (record, fallbackOptions) => {
     return;
   }
 
-  const payload = record.detailPayload || {};
   detailState.orderNo = record.orderNo;
-  detailState.status = payload.status || record.listItem?.statusLabel || detailState.status;
-  detailState.title = payload.title || record.listItem?.projectName || detailState.title;
-  detailState.price = payload.price || record.listItem?.price || detailState.price;
-  detailState.summary = payload.summary || record.listItem?.projectDesc || detailState.summary;
-  detailState.payMethod = payload.payMethod || record.activeOrder?.payMethod || detailState.payMethod;
-  detailState.assignee = payload.assignee || record.activeOrder?.rider?.name || detailState.assignee;
-  detailState.infoLabel = record.activeOrder?.addressLabel || '服务信息';
-  detailState.infoTitle = record.activeOrder?.address?.title || detailState.infoTitle;
-  detailState.infoDesc = record.activeOrder?.address?.detail || detailState.infoDesc;
-  detailState.type = record.type || 'generic';
-  detailState.timeline = payload.timeline?.length ? payload.timeline : detailState.timeline;
+  detailState.status = record.statusLabel || detailState.status;
+  detailState.title = record.projectName || detailState.title;
+  detailState.price =
+    typeof record.price === 'number' ? `¥${record.price.toFixed(2)}` : record.price || detailState.price;
+  detailState.summary = record.projectDesc || detailState.summary;
+  detailState.payMethod = record.paymentMethod || detailState.payMethod;
+  detailState.assignee = record.rider?.name || '平台分派';
+  detailState.infoLabel =
+    record.serviceType === 'buy' ? '收货地址' : record.serviceType === 'send' ? '收件地址' : '服务地址';
+  detailState.infoTitle = record.receiverTitle || record.address?.title || detailState.infoTitle;
+  detailState.infoDesc = record.receiverDetail || record.address?.detail || detailState.infoDesc;
 
-  sectionsState.buy = payload.sections?.buy || {};
-  sectionsState.send = payload.sections?.send || {};
-  sectionsState.errand = payload.sections?.errand || {};
-  sectionsState.all = payload.sections?.all || {};
+  const typeMap = { buy: 'buy', send: 'send', task: 'errand', universal: 'all' };
+  detailState.type = typeMap[record.serviceType] || 'generic';
+  detailState.timeline = record.steps?.length ? record.steps : detailState.timeline;
+
+  // 映射模块字段展示优化，与后端数据对齐
+  sectionsState.buy = {
+    goodsName: record.goods || record.projectName || '商品信息',
+    goodsPrice: '按实际小票结算',
+    pickupAddress: (record.pickupTitle || '') + ' ' + (record.pickupDetail || ''),
+    receiverAddress: (record.receiverTitle || '') + ' ' + (record.receiverDetail || ''),
+    deliverTime: record.eta || record.etaTitle || '尽快送达',
+    remark: record.note || '无',
+    feeText: `跑腿费 ¥${record.price}`,
+    imageUrl: record.image || '',
+  };
+
+  sectionsState.send = {
+    itemName: record.projectName || record.goods || '寄送物品',
+    itemRemark: record.projectDesc || '无',
+    pickupAddress: (record.pickupTitle || '') + ' ' + (record.pickupDetail || ''),
+    receiverAddress: (record.receiverTitle || '') + ' ' + (record.receiverDetail || ''),
+    deliverySpeed: record.eta || '普通专送',
+    insurance: '未保价',
+  };
+
+  sectionsState.errand = {
+    taskType: record.category || record.projectName || '代办任务',
+    taskDesc: record.projectDesc || '无',
+    taskTime: record.eta || record.etaTitle || '尽快办理',
+    priority: '普通',
+    budget: `跑腿费 ¥${record.price}`,
+  };
+
+  sectionsState.all = {
+    sceneText: record.category || record.projectName || '万能需求',
+    requirement: record.projectDesc || '无',
+    deadline: record.eta || '按约定时间',
+    budget: `¥${record.price}`,
+    suggestion: '专属客服跟进中',
+  };
 };
 
 onLoad((options) => {
-  const orderNo = options?.orderNo || detailState.orderNo;
-  const orderRecord = getOrderRecordByNo(orderNo);
-  applyOrderRecord(orderRecord, {
-    orderNo,
+  const recordId = options?.id || options?.orderNo || detailState.orderNo;
+
+  applyOrderRecord(null, {
+    orderNo: options?.orderNo || detailState.orderNo,
     status: options?.status,
     projectName: options?.projectName,
     price: options?.price,
   });
+
+  fetchOrderDetail(recordId)
+    .then((record) => {
+      applyOrderRecord(record, {
+        orderNo: options?.orderNo || detailState.orderNo,
+      });
+    })
+    .catch((error) => {
+      uni.showToast({
+        title: error?.message || '订单详情加载失败',
+        icon: 'none',
+      });
+    });
 });
 
 const goBack = () => {
   uni.navigateBack();
-};
-
-const shareOrder = () => {
-  uni.showToast({
-    title: '分享功能待接入',
-    icon: 'none',
-  });
 };
 
 const goService = () => {

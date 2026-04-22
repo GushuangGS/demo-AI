@@ -23,13 +23,21 @@
             <LocalIcon class="panel-head-icon" name="inventory_2" />
             <text class="panel-head-title">寄送信息</text>
           </view>
-          <input v-model="form.itemName" class="text-input" placeholder="请输入物品名称，如：文件合同、生日蛋糕" />
-          <textarea
-            v-model="form.itemRemark"
-            class="text-area"
-            maxlength="120"
-            placeholder="补充物品大小、是否易碎、是否需要保温等说明"
+          <input
+            v-model="form.itemName"
+            class="text-input"
+            placeholder="请输入物品名称，如：文件合同、生日蛋糕"
+            :cursor-spacing="20"
           />
+          <view class="textarea-wrapper">
+            <textarea
+              v-model="form.itemRemark"
+              class="text-area"
+              maxlength="120"
+              placeholder="补充物品大小、是否易碎、是否需要保温等说明"
+              :cursor-spacing="20"
+            />
+          </view>
         </view>
 
         <view class="panel">
@@ -88,7 +96,8 @@
 import LocalIcon from '@/components/LocalIcon.vue';
 
 import { computed, reactive } from 'vue';
-import { buildCommonOrderRecord, submitOrderRecord } from '../../utils/order-store';
+import { createOrder } from '../../api/order';
+import { ORDER_REDIRECT_KEY } from '../../utils/order-store';
 
 const avatarUrl = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80';
 
@@ -105,14 +114,14 @@ const form = reactive({
 
 const isSubmitEnabled = computed(() =>
   [
-    form.itemName.trim(),
-    form.itemRemark.trim(),
-    form.pickupAddress.trim(),
-    form.pickupContact.trim(),
-    form.receiverAddress.trim(),
-    form.receiverContact.trim(),
-    form.deliverySpeed.trim(),
-    form.insurance.trim(),
+    String(form.itemName).trim(),
+    String(form.itemRemark).trim(),
+    String(form.pickupAddress).trim(),
+    String(form.pickupContact).trim(),
+    String(form.receiverAddress).trim(),
+    String(form.receiverContact).trim(),
+    String(form.deliverySpeed).trim(),
+    String(form.insurance).trim(),
   ].every(Boolean),
 );
 
@@ -136,80 +145,31 @@ const selectInsurance = () => {
   });
 };
 
-const submitSendOrder = () => {
+const submitSendOrder = async () => {
   if (!isSubmitEnabled.value) {
     uni.showToast({
-      title: '请先完善全部寄送信息',
+      title: '请先完善全部下单信息',
       icon: 'none',
     });
     return;
   }
 
-  const orderNo = `#UA-${String(Date.now()).slice(-4)}-SD`;
-  const activeOrderPayload = {
-    orderNo,
-    eta: form.deliverySpeed === '30 分钟加急' ? '预计 30 分钟送达' : `预计 ${form.deliverySpeed}`,
-    payMethod: '在线支付',
-    goods: `${form.itemName.trim()} · ${form.itemRemark.trim()}`,
-    addressLabel: '收件地址',
-    detailLabel: '寄送物品',
-    rider: {
-      name: '同城配送专员',
-      rating: '4.9',
-      completed: '3,800+ 配送',
-      avatar: 'https://images.unsplash.com/photo-1541534401786-2077eed87a72?auto=format&fit=crop&w=240&q=80',
-    },
-    steps: [
-      {
-        title: '已安排取件',
-        desc: '配送专员正在前往取件地址',
-        time: '刚刚更新',
-        active: true,
-      },
-      {
-        title: '已送往收件点',
-        desc: `预计按 ${form.deliverySpeed} 完成配送`,
-        time: '待完成',
-        active: false,
-      },
-    ],
-    address: {
-      title: form.receiverAddress,
-      detail: form.receiverContact,
-    },
-  };
-
-  const orderListPayload = {
-    orderNo,
-    filter: 'inProgress',
-    category: '帮我送',
-    projectName: form.itemName.trim(),
-    projectDesc: `${form.pickupAddress} -> ${form.receiverAddress}`,
-    price: '¥25.00',
-    actionText: '联系客服',
-    actionType: 'service',
-    statusLabel: '进行中',
-    statusClass: 'status-blue',
-    icon: 'local_shipping',
-    iconClass: 'icon-blue',
-    secondary: false,
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=320&q=80',
-  };
-
-  const orderRecord = buildCommonOrderRecord({
-    orderNo,
-    type: 'send',
-    listItem: orderListPayload,
-    activeOrder: activeOrderPayload,
-    detailPayload: {
-      title: form.itemName.trim(),
-      summary: `配送专员将从 ${form.pickupAddress} 取件后送往 ${form.receiverAddress}。`,
-      price: orderListPayload.price,
-      status: '进行中',
-      payMethod: activeOrderPayload.payMethod,
-      assignee: activeOrderPayload.rider.name,
-      timeline: activeOrderPayload.steps,
-      sections: {
+  try {
+    uni.showLoading({ title: '正在提交...' });
+    await createOrder({
+      serviceType: 'send',
+      projectName: form.itemName.trim(),
+      projectDesc: `${form.pickupAddress} · 送至 ${form.receiverAddress}`,
+      goods: `${form.itemName.trim()} · ${form.itemRemark.trim()}`,
+      price: 25.0,
+      pickupTitle: form.pickupAddress,
+      pickupDetail: form.pickupContact,
+      receiverTitle: form.receiverAddress,
+      receiverDetail: form.receiverContact,
+      note: form.itemRemark,
+      eta: form.deliverySpeed === '即刻出发' ? '预计 30 分钟内送达' : `预计 ${form.deliverySpeed} 送达`,
+      detailSummary: `配送任务已创建，骑手正赶往 ${form.pickupAddress} 取件。`,
+      detailSections: {
         send: {
           itemName: form.itemName.trim(),
           itemRemark: form.itemRemark.trim(),
@@ -219,15 +179,23 @@ const submitSendOrder = () => {
           receiverContact: form.receiverContact,
           deliverySpeed: form.deliverySpeed,
           insurance: form.insurance,
+          feeText: '基础运费 ¥20.00 + 动态溢价 ¥5.00，合计 ¥25.00',
         },
       },
-    },
-  });
+    });
+    uni.hideLoading();
 
-  submitOrderRecord(orderRecord);
-  uni.reLaunch({
-    url: '/pages/order/order',
-  });
+    uni.setStorageSync(ORDER_REDIRECT_KEY, 'delivery');
+    uni.reLaunch({
+      url: '/pages/order/order',
+    });
+  } catch (error) {
+    uni.hideLoading();
+    uni.showToast({
+      title: error?.message || '下单失败，请稍后重试',
+      icon: 'none',
+    });
+  }
 };
 
 const goBack = () => {
@@ -261,8 +229,7 @@ const goBack = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(242, 243, 245, 0.92);
-  backdrop-filter: blur(24px);
+  background: #f2f3f5;
 }
 
 .top-back {
@@ -374,13 +341,15 @@ const goBack = () => {
 }
 
 .text-input,
-.text-area,
+.textarea-wrapper,
 .route-card {
   background: #eceef2;
   border-radius: 16px;
 }
 
 .text-input {
+  width: 100%;
+  box-sizing: border-box;
   height: 48px;
   margin-top: 16px;
   padding: 0 14px;
@@ -388,12 +357,20 @@ const goBack = () => {
   color: #1d2128;
 }
 
-.text-area {
+.textarea-wrapper {
   width: 100%;
   height: 106px;
   margin-top: 12px;
   padding: 14px;
   box-sizing: border-box;
+  background: #eceef2;
+  border-radius: 16px;
+}
+
+.text-area {
+  width: 100%;
+  height: 100%;
+  background: transparent;
   font-size: 14px;
   line-height: 1.65;
   color: #1d2128;

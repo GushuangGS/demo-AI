@@ -24,19 +24,28 @@
             <text class="panel-head-title">商品信息</text>
           </view>
 
-          <textarea
-            v-model="form.goodsName"
-            class="goods-textarea"
-            maxlength="120"
-            placeholder="请输入想买的商品，如：两杯瑞幸生椰拿铁，去冰半糖..."
-          />
+          <view class="textarea-wrapper">
+            <textarea
+              v-model="form.goodsName"
+              class="goods-textarea"
+              maxlength="120"
+              placeholder="请输入想买的商品，如：两杯瑞幸生椰拿铁，去冰半糖..."
+              :cursor-spacing="20"
+            />
+          </view>
 
           <view class="goods-actions">
             <view class="price-card">
               <text class="price-label">预估价格</text>
               <view class="price-input-row">
                 <text class="price-currency">¥</text>
-                <input v-model="form.goodsPrice" class="price-input" type="digit" placeholder="0.00" />
+                <input
+                  v-model="form.goodsPrice"
+                  class="price-input"
+                  type="digit"
+                  placeholder="0.00"
+                  :cursor-spacing="20"
+                />
               </view>
             </view>
 
@@ -132,7 +141,8 @@ import LocalIcon from '@/components/LocalIcon.vue';
 
 import { computed, reactive } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
-import { buildCommonOrderRecord, submitOrderRecord } from '../../utils/order-store';
+import { createOrder } from '../../api/order';
+import { ORDER_REDIRECT_KEY } from '../../utils/order-store';
 const BUY_ADDRESS_STORAGE_KEY = 'urban_architect_buy_address_selection';
 
 const avatarUrl = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80';
@@ -150,13 +160,13 @@ const form = reactive({
 
 const isSubmitEnabled = computed(() => {
   return [
-    form.goodsName.trim(),
-    form.goodsPrice.trim(),
-    form.pickupAddress.trim(),
-    form.receiverAddress.trim(),
-    form.receiverContact.trim(),
-    form.deliverTime.trim(),
-    form.remark.trim(),
+    String(form.goodsName).trim(),
+    String(form.goodsPrice).trim(),
+    String(form.pickupAddress).trim(),
+    String(form.receiverAddress).trim(),
+    String(form.receiverContact).trim(),
+    String(form.deliverTime).trim(),
+    String(form.remark).trim(),
   ].every(Boolean);
 });
 
@@ -198,65 +208,6 @@ const selectRemark = () => {
   });
 };
 
-const buildActiveOrderPayload = () => {
-  const shortNo = `#UA-${String(Date.now()).slice(-4)}-BM`;
-  const goodsPrice = Number.parseFloat(form.goodsPrice || '0').toFixed(2);
-
-  return {
-    orderNo: shortNo,
-    eta: form.deliverTime === '立即送达' ? '预计 12:45 送达' : `预计 ${form.deliverTime}`,
-    payMethod: '微信支付',
-    goods: `${form.goodsName.trim()} · 预估¥${goodsPrice}`,
-    addressLabel: '收货地址',
-    detailLabel: '代购商品',
-    rider: {
-      name: '张大伟',
-      rating: '4.9',
-      completed: '1,200+ 订单',
-      avatar: 'https://images.unsplash.com/photo-1541534401786-2077eed87a72?auto=format&fit=crop&w=240&q=80',
-    },
-    steps: [
-      {
-        title: '正在配送中',
-        desc: '骑手已接单，正在前往购买点并赶赴您的收货地址',
-        time: '刚刚更新',
-        active: true,
-      },
-      {
-        title: '配送完成',
-        desc: '订单送达后可在订单页继续评价',
-        time: '待完成',
-        active: false,
-      },
-    ],
-    address: {
-      title: form.receiverAddress,
-      detail: form.receiverContact,
-    },
-  };
-};
-
-const buildOrderListPayload = (activeOrderPayload) => {
-  const previewText = `${form.pickupAddress} · 送至 ${form.receiverAddress}`;
-
-  return {
-    orderNo: activeOrderPayload.orderNo,
-    filter: 'inProgress',
-    category: '帮我买',
-    projectName: form.goodsName.trim(),
-    projectDesc: previewText,
-    price: `¥${Number.parseFloat(form.goodsPrice || '0').toFixed(2)}`,
-    actionText: '联系客服',
-    actionType: 'service',
-    statusLabel: '进行中',
-    statusClass: 'status-blue',
-    icon: 'shopping_bag',
-    iconClass: 'icon-blue',
-    secondary: false,
-    image: form.imageUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=320&q=80',
-  };
-};
-
 const syncSelectedAddress = () => {
   const selected = uni.getStorageSync(BUY_ADDRESS_STORAGE_KEY);
   if (!selected || typeof selected !== 'object' || !selected.type) {
@@ -275,7 +226,7 @@ const syncSelectedAddress = () => {
   uni.removeStorageSync(BUY_ADDRESS_STORAGE_KEY);
 };
 
-const submitOrder = () => {
+const submitOrder = async () => {
   if (!isSubmitEnabled.value) {
     uni.showToast({
       title: '请先完善全部下单信息',
@@ -284,25 +235,28 @@ const submitOrder = () => {
     return;
   }
 
-  const activeOrderPayload = buildActiveOrderPayload();
-  const orderListPayload = buildOrderListPayload(activeOrderPayload);
-  const orderRecord = buildCommonOrderRecord({
-    orderNo: activeOrderPayload.orderNo,
-    type: 'buy',
-    listItem: orderListPayload,
-    activeOrder: activeOrderPayload,
-    detailPayload: {
-      title: form.goodsName.trim(),
-      summary: `代购任务已创建，正在从 ${form.pickupAddress} 为您采购并配送。`,
-      price: orderListPayload.price,
-      status: '进行中',
-      payMethod: '微信支付',
-      assignee: '同城代购专员',
-      timeline: activeOrderPayload.steps,
-      sections: {
+  const parsedPrice = Number.parseFloat(form.goodsPrice || '0');
+  const displayPrice = `¥${parsedPrice.toFixed(2)}`;
+
+  try {
+    uni.showLoading({ title: '正在提交...' });
+    await createOrder({
+      serviceType: 'buy',
+      projectName: form.goodsName.trim(),
+      projectDesc: `${form.pickupAddress} · 送至 ${form.receiverAddress}`,
+      goods: `${form.goodsName.trim()} · 预估${displayPrice}`,
+      price: parsedPrice,
+      pickupTitle: form.pickupAddress,
+      pickupDetail: '系统将就近选择门店',
+      receiverTitle: form.receiverAddress,
+      receiverDetail: form.receiverContact,
+      note: form.remark,
+      eta: form.deliverTime === '立即送达' ? '预计尽快送达' : `预计 ${form.deliverTime}`,
+      detailSummary: `代购任务已创建，正在从 ${form.pickupAddress} 为您采购并配送。`,
+      detailSections: {
         buy: {
           goodsName: form.goodsName.trim(),
-          goodsPrice: orderListPayload.price,
+          goodsPrice: displayPrice,
           pickupAddress: form.pickupAddress,
           receiverAddress: form.receiverAddress,
           receiverContact: form.receiverContact,
@@ -312,13 +266,20 @@ const submitOrder = () => {
           feeText: '配送费 ¥15.00 + 小费 ¥5.00，合计 ¥20.00',
         },
       },
-    },
-  });
+    });
+    uni.hideLoading();
 
-  submitOrderRecord(orderRecord);
-  uni.reLaunch({
-    url: '/pages/order/order',
-  });
+    uni.setStorageSync(ORDER_REDIRECT_KEY, 'delivery');
+    uni.reLaunch({
+      url: '/pages/order/order',
+    });
+  } catch (error) {
+    uni.hideLoading();
+    uni.showToast({
+      title: error?.message || '下单失败，请稍后重试',
+      icon: 'none',
+    });
+  }
 };
 
 onShow(() => {
@@ -327,10 +288,6 @@ onShow(() => {
 
 const goBack = () => {
   uni.navigateBack();
-};
-
-const switchTab = (url) => {
-  uni.reLaunch({ url });
 };
 </script>
 
@@ -360,8 +317,7 @@ const switchTab = (url) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(242, 243, 245, 0.92);
-  backdrop-filter: blur(24px);
+  background: #f2f3f5;
 }
 
 .top-back {
@@ -469,7 +425,7 @@ const switchTab = (url) => {
   color: #1c2027;
 }
 
-.goods-textarea {
+.textarea-wrapper {
   width: 100%;
   height: 118px;
   margin-top: 16px;
@@ -477,6 +433,12 @@ const switchTab = (url) => {
   border-radius: 16px;
   background: #eceef2;
   box-sizing: border-box;
+}
+
+.goods-textarea {
+  width: 100%;
+  height: 100%;
+  background: transparent;
   font-size: 14px;
   line-height: 1.65;
   color: #1d2128;
@@ -522,7 +484,7 @@ const switchTab = (url) => {
 .price-input {
   flex: 1;
   margin-left: 6px;
-  height: 26px;
+  height: 32px;
   font-size: 28px;
   font-weight: 800;
   color: #6f7686;

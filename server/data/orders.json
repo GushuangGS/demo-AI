@@ -1,5 +1,76 @@
 [
   {
+    "id": "order_1776852033950",
+    "userId": "user_demo_001",
+    "orderNo": "BUY-1776852033950",
+    "serviceType": "buy",
+    "serviceLabel": "帮我买",
+    "status": "in_progress",
+    "statusLabel": "进行中",
+    "filter": "inProgress",
+    "category": "帮我买",
+    "projectName": "帮我买一份牛排和炸鸡",
+    "projectDesc": "就近购买 · 送至 静安区南京西路1601号",
+    "goods": "帮我买一份牛排和炸鸡 · 预估¥288.00",
+    "price": 288,
+    "paymentMethod": "微信支付",
+    "image": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=320&q=80",
+    "pickupTitle": "就近购买",
+    "pickupDetail": "系统将就近选择门店",
+    "receiverTitle": "静安区南京西路1601号",
+    "receiverDetail": "李女士 136****9292",
+    "etaTitle": "预计 5 分钟内接单",
+    "etaDesc": "系统已为您推送给附近 3 位服务人员",
+    "eta": "预计 1小时内送达",
+    "note": "需要开发票",
+    "actionText": "联系客服",
+    "actionType": "service",
+    "secondary": false,
+    "rider": {
+      "name": "陈师傅",
+      "rating": "4.9",
+      "completed": "2,340+ 订单",
+      "avatar": "https://images.unsplash.com/photo-1541534401786-2077eed87a72?auto=format&fit=crop&w=240&q=80"
+    },
+    "steps": [
+      {
+        "title": "任务处理中",
+        "desc": "代购专员已接单，正在为您采购并配送",
+        "time": "18:00",
+        "active": true
+      },
+      {
+        "title": "等待完成",
+        "desc": "服务完成后将同步最新进展",
+        "time": "待完成",
+        "active": false
+      }
+    ],
+    "address": {
+      "title": "静安区南京西路1601号",
+      "detail": "李女士 136****9292"
+    },
+    "addressLabel": "收货地址",
+    "detailLabel": "帮我买详情",
+    "assignee": "陈师傅",
+    "detailSummary": "代购任务已创建，正在从 就近购买 为您采购并配送。",
+    "detailSections": {
+      "buy": {
+        "goodsName": "帮我买一份牛排和炸鸡",
+        "goodsPrice": "¥288.00",
+        "pickupAddress": "就近购买",
+        "receiverAddress": "静安区南京西路1601号",
+        "receiverContact": "李女士 136****9292",
+        "deliverTime": "1小时内送达",
+        "remark": "需要开发票",
+        "imageUrl": "http://tmp/qhW11o_qucYC99405bfbb1fa7f4139ce438565f92a99.jpeg",
+        "feeText": "配送费 ¥15.00 + 小费 ¥5.00，合计 ¥20.00"
+      }
+    },
+    "createdAt": "2026-04-22T10:00:33.950Z",
+    "updatedAt": "2026-04-22T10:00:33.950Z"
+  },
+  {
     "id": "order_seed_001",
     "userId": "user_demo_001",
     "orderNo": "ERR-20260422-001",

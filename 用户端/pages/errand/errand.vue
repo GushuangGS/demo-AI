@@ -41,12 +41,15 @@
             <LocalIcon class="panel-head-icon" name="edit_note" />
             <text class="panel-head-title">任务说明</text>
           </view>
-          <textarea
-            v-model="form.taskDesc"
-            class="text-area"
-            maxlength="180"
-            placeholder="请描述具体事项、办理地点、所需材料、截止时间等"
-          />
+          <view class="textarea-wrapper">
+            <textarea
+              v-model="form.taskDesc"
+              class="text-area"
+              maxlength="180"
+              placeholder="请描述具体事项、办理地点、所需材料、截止时间等"
+              :cursor-spacing="20"
+            />
+          </view>
         </view>
 
         <view class="panel selector-panel" @tap="selectTime">
@@ -81,14 +84,26 @@
               <text class="budget-label">起步预算</text>
               <view class="budget-input-row">
                 <text class="budget-prefix">¥</text>
-                <input v-model="form.budgetMin" class="budget-input" type="digit" placeholder="50" />
+                <input
+                  v-model="form.budgetMin"
+                  class="budget-input"
+                  type="digit"
+                  placeholder="50"
+                  :cursor-spacing="20"
+                />
               </view>
             </view>
             <view class="budget-box">
               <text class="budget-label">上限预算</text>
               <view class="budget-input-row">
                 <text class="budget-prefix">¥</text>
-                <input v-model="form.budgetMax" class="budget-input" type="digit" placeholder="200" />
+                <input
+                  v-model="form.budgetMax"
+                  class="budget-input"
+                  type="digit"
+                  placeholder="200"
+                  :cursor-spacing="20"
+                />
               </view>
             </view>
           </view>
@@ -98,7 +113,7 @@
           class="submit-button"
           :class="{ 'submit-button-disabled': !isSubmitEnabled }"
           :disabled="!isSubmitEnabled"
-          @tap="submitErrand"
+          @tap="submitErrandOrder"
         >
           发起代办
         </button>
@@ -110,7 +125,8 @@
 <script setup>
 import { computed, reactive } from 'vue';
 import LocalIcon from '../../components/LocalIcon.vue';
-import { buildCommonOrderRecord, submitOrderRecord } from '../../utils/order-store';
+import { createOrder } from '../../api/order';
+import { ORDER_REDIRECT_KEY } from '../../utils/order-store';
 
 const avatarUrl = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80';
 
@@ -127,12 +143,12 @@ const form = reactive({
 
 const isSubmitEnabled = computed(() =>
   [
-    form.taskType.trim(),
-    form.taskDesc.trim(),
-    form.taskTime.trim(),
-    form.priority.trim(),
-    form.budgetMin.trim(),
-    form.budgetMax.trim(),
+    String(form.taskType).trim(),
+    String(form.taskDesc).trim(),
+    String(form.taskTime).trim(),
+    String(form.priority).trim(),
+    String(form.budgetMin).trim(),
+    String(form.budgetMax).trim(),
   ].every(Boolean),
 );
 
@@ -156,95 +172,55 @@ const selectPriority = () => {
   });
 };
 
-const submitErrand = () => {
+const submitErrandOrder = async () => {
   if (!isSubmitEnabled.value) {
     uni.showToast({
-      title: '请先完善全部代办信息',
+      title: '请先完善全部下单信息',
       icon: 'none',
     });
     return;
   }
 
-  const orderNo = `#UA-${String(Date.now()).slice(-4)}-DB`;
-  const activeOrderPayload = {
-    orderNo,
-    eta: `${form.taskTime} 前处理`,
-    payMethod: '线下确认',
-    goods: `${form.taskType} · ${form.taskDesc.trim()}`,
-    addressLabel: '办理说明',
-    detailLabel: '任务详情',
-    rider: {
-      name: '专属代办顾问',
-      rating: '4.8',
-      completed: '2,400+ 任务',
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=240&q=80',
-    },
-    steps: [
-      {
-        title: '任务处理中',
-        desc: `顾问已接单，当前按 ${form.priority} 推进`,
-        time: '刚刚更新',
-        active: true,
-      },
-      {
-        title: '等待结果回传',
-        desc: `${form.taskTime} 前同步最新进展`,
-        time: '待完成',
-        active: false,
-      },
-    ],
-    address: {
-      title: form.taskType,
-      detail: `预算 ¥${form.budgetMin} - ¥${form.budgetMax}`,
-    },
-  };
-
-  const orderListPayload = {
-    orderNo,
-    filter: 'inProgress',
-    category: '帮我办',
-    projectName: form.taskType,
-    projectDesc: form.taskDesc.trim(),
-    price: `¥${form.budgetMin} - ¥${form.budgetMax}`,
-    actionText: '联系客服',
-    actionType: 'service',
-    statusLabel: '进行中',
-    statusClass: 'status-blue',
-    icon: 'fact_check',
-    iconClass: 'icon-blue',
-    secondary: false,
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=320&q=80',
-  };
-
-  const orderRecord = buildCommonOrderRecord({
-    orderNo,
-    type: 'errand',
-    listItem: orderListPayload,
-    activeOrder: activeOrderPayload,
-    detailPayload: {
-      title: form.taskType,
-      summary: `代办顾问已接单，将按 ${form.priority} 推进任务。`,
-      price: orderListPayload.price,
-      status: '进行中',
-      payMethod: activeOrderPayload.payMethod,
-      assignee: activeOrderPayload.rider.name,
-      timeline: activeOrderPayload.steps,
-      sections: {
+  try {
+    uni.showLoading({ title: '正在提交...' });
+    await createOrder({
+      serviceType: 'task',
+      projectName: `${form.taskType} · ${form.priority}处理`,
+      projectDesc: form.taskDesc.trim().substring(0, 30) + '...',
+      goods: form.taskDesc.trim(),
+      price: Number.parseFloat(form.budgetMin || '0'),
+      pickupTitle: '任务办理地点',
+      pickupDetail: '详见任务说明',
+      receiverTitle: '任务交付地点',
+      receiverDetail: '详见任务说明',
+      note: form.taskDesc,
+      eta: form.taskTime === '尽快处理' ? '预计 1 小时内响应' : `预计 ${form.taskTime}`,
+      detailSummary: `跑腿任务已发布，系统正在为您匹配最合适的代办专员。`,
+      detailSections: {
         errand: {
           taskType: form.taskType,
           taskDesc: form.taskDesc.trim(),
           taskTime: form.taskTime,
           priority: form.priority,
-          budget: `¥${form.budgetMin} - ¥${form.budgetMax}`,
+          budgetMin: form.budgetMin,
+          budgetMax: form.budgetMax,
+          feeText: `预估报酬 ¥${form.budgetMin} - ¥${form.budgetMax}`,
         },
       },
-    },
-  });
+    });
+    uni.hideLoading();
 
-  submitOrderRecord(orderRecord);
-  uni.reLaunch({
-    url: '/pages/order/order',
-  });
+    uni.setStorageSync(ORDER_REDIRECT_KEY, 'delivery');
+    uni.reLaunch({
+      url: '/pages/order/order',
+    });
+  } catch (error) {
+    uni.hideLoading();
+    uni.showToast({
+      title: error?.message || '下单失败，请稍后重试',
+      icon: 'none',
+    });
+  }
 };
 
 const goBack = () => {
@@ -278,8 +254,7 @@ const goBack = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(242, 243, 245, 0.92);
-  backdrop-filter: blur(24px);
+  background: #f2f3f5;
 }
 
 .top-back {
@@ -421,7 +396,7 @@ const goBack = () => {
   color: #1847d7;
 }
 
-.text-area {
+.textarea-wrapper {
   width: 100%;
   height: 120px;
   margin-top: 16px;
@@ -429,6 +404,12 @@ const goBack = () => {
   border-radius: 16px;
   background: #eceef2;
   box-sizing: border-box;
+}
+
+.text-area {
+  width: 100%;
+  height: 100%;
+  background: transparent;
   font-size: 14px;
   line-height: 1.65;
   color: #1d2128;

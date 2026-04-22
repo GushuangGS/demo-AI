@@ -41,12 +41,15 @@
             <LocalIcon class="panel-head-icon" name="forum" />
             <text class="panel-head-title">详细需求</text>
           </view>
-          <textarea
-            v-model="form.requirement"
-            class="text-area"
-            maxlength="200"
-            placeholder="请尽量详细描述诉求、地点、期望时间、预算范围和特殊要求"
-          />
+          <view class="textarea-wrapper">
+            <textarea
+              v-model="form.requirement"
+              class="text-area"
+              maxlength="200"
+              placeholder="请尽量详细描述诉求、地点、期望时间、预算范围和特殊要求"
+              :cursor-spacing="20"
+            />
+          </view>
         </view>
 
         <view class="panel selector-panel" @tap="selectDeadline">
@@ -95,7 +98,8 @@
 import LocalIcon from '@/components/LocalIcon.vue';
 
 import { computed, reactive, ref } from 'vue';
-import { buildCommonOrderRecord, submitOrderRecord } from '../../utils/order-store';
+import { createOrder } from '../../api/order';
+import { ORDER_REDIRECT_KEY } from '../../utils/order-store';
 
 const avatarUrl = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80';
 
@@ -109,7 +113,12 @@ const form = reactive({
 });
 
 const isSubmitEnabled = computed(() => {
-  return Boolean(selectedScenes.value.length && form.requirement.trim() && form.deadline.trim() && form.budget.trim());
+  return Boolean(
+    selectedScenes.value.length &&
+    String(form.requirement).trim() &&
+    String(form.deadline).trim() &&
+    String(form.budget).trim(),
+  );
 });
 
 const toggleScene = (scene) => {
@@ -141,96 +150,53 @@ const selectBudget = () => {
   });
 };
 
-const submitAllInOne = () => {
+const submitAllInOne = async () => {
   if (!isSubmitEnabled.value) {
     uni.showToast({
-      title: '请先完善全部需求信息',
+      title: '请完善详细需求说明',
       icon: 'none',
     });
     return;
   }
 
-  const orderNo = `#UA-${String(Date.now()).slice(-4)}-WN`;
-  const sceneText = selectedScenes.value.join(' / ');
-  const activeOrderPayload = {
-    orderNo,
-    eta: `${form.deadline} 前响应`,
-    payMethod: '待沟通确认',
-    goods: `${sceneText} · ${form.requirement.trim()}`,
-    addressLabel: '需求概览',
-    detailLabel: '服务说明',
-    rider: {
-      name: '智能分派顾问',
-      rating: '4.9',
-      completed: '5,100+ 咨询',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80',
-    },
-    steps: [
-      {
-        title: '需求已受理',
-        desc: '系统正在匹配最合适的服务方案',
-        time: '刚刚更新',
-        active: true,
-      },
-      {
-        title: '等待人工确认',
-        desc: '客服将在 5 分钟内回访您',
-        time: '待完成',
-        active: false,
-      },
-    ],
-    address: {
-      title: sceneText,
-      detail: `${form.deadline} · ${form.budget}`,
-    },
-  };
-
-  const orderListPayload = {
-    orderNo,
-    filter: 'inProgress',
-    category: '万能帮',
-    projectName: sceneText,
-    projectDesc: form.requirement.trim(),
-    price: form.budget,
-    actionText: '联系客服',
-    actionType: 'service',
-    statusLabel: '进行中',
-    statusClass: 'status-blue',
-    icon: 'auto_awesome',
-    iconClass: 'icon-blue',
-    secondary: false,
-    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=320&q=80',
-  };
-
-  const orderRecord = buildCommonOrderRecord({
-    orderNo,
-    type: 'all',
-    listItem: orderListPayload,
-    activeOrder: activeOrderPayload,
-    detailPayload: {
-      title: sceneText,
-      summary: '平台已受理该非标准化需求，正在进行智能分派与人工确认。',
-      price: orderListPayload.price,
-      status: '进行中',
-      payMethod: activeOrderPayload.payMethod,
-      assignee: activeOrderPayload.rider.name,
-      timeline: activeOrderPayload.steps,
-      sections: {
+  try {
+    uni.showLoading({ title: '正在提交...' });
+    await createOrder({
+      serviceType: 'universal',
+      projectName: selectedScenes.value.join(' / ') || '万能帮',
+      projectDesc: form.requirement.trim().substring(0, 30) + '...',
+      goods: form.requirement.trim(),
+      price: Number.parseFloat(form.budget.replace(/[^\d.]/g, '') || '0'),
+      pickupTitle: '任务需求点',
+      pickupDetail: '详见需求说明',
+      receiverTitle: '任务交付点',
+      receiverDetail: '详见需求说明',
+      note: form.requirement,
+      eta: form.deadline === '尽快处理' ? '预计 30 分钟内响应' : `预计 ${form.deadline}`,
+      detailSummary: `万能帮需求已收到，客服将在 5 分钟内为您对接专属服务专员。`,
+      detailSections: {
         all: {
-          sceneText,
           requirement: form.requirement.trim(),
           deadline: form.deadline,
           budget: form.budget,
-          suggestion: '客服将在 5 分钟内与您确认服务边界、预算和执行方式。',
+          selectedScenes: selectedScenes.value.join(', '),
+          feeText: `预估预算 ${form.budget}`,
         },
       },
-    },
-  });
+    });
+    uni.hideLoading();
 
-  submitOrderRecord(orderRecord);
-  uni.reLaunch({
-    url: '/pages/order/order',
-  });
+    uni.setStorageSync(ORDER_REDIRECT_KEY, 'delivery');
+    uni.reLaunch({
+      url: '/pages/order/order',
+    });
+  } catch (error) {
+    uni.hideLoading();
+    uni.showToast({
+      title: error?.message || '下单失败，请稍后重试',
+      icon: 'none',
+    });
+  }
 };
 
 const goBack = () => {
@@ -264,8 +230,7 @@ const goBack = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(242, 243, 245, 0.92);
-  backdrop-filter: blur(24px);
+  background: #f2f3f5;
 }
 
 .top-back {
@@ -407,7 +372,7 @@ const goBack = () => {
   color: #1847d7;
 }
 
-.text-area {
+.textarea-wrapper {
   width: 100%;
   height: 128px;
   margin-top: 16px;
@@ -415,6 +380,12 @@ const goBack = () => {
   border-radius: 16px;
   background: #eceef2;
   box-sizing: border-box;
+}
+
+.text-area {
+  width: 100%;
+  height: 100%;
+  background: transparent;
   font-size: 14px;
   line-height: 1.65;
   color: #1d2128;

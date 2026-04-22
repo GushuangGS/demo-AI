@@ -136,7 +136,9 @@
                 :class="activeFilter === item.key ? 'filter-item-active' : ''"
                 @tap="activeFilter = item.key"
               >
-                <text class="filter-text" :class="activeFilter === item.key ? 'filter-text-active' : ''">{{ item.label }}</text>
+                <text class="filter-text" :class="activeFilter === item.key ? 'filter-text-active' : ''">{{
+                  item.label
+                }}</text>
               </view>
             </view>
 
@@ -162,7 +164,7 @@
                   <view class="order-main">
                     <text class="order-name">{{ item.projectName }}</text>
                     <text class="order-desc">{{ item.projectDesc }}</text>
-                    <text class="order-price">{{ item.price }}</text>
+                    <text class="order-price">{{ item.priceText }}</text>
                   </view>
                 </view>
 
@@ -213,14 +215,10 @@ import LocalIcon from '@/components/LocalIcon.vue';
 
 import { computed, ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
-import {
-  ACTIVE_ORDER_STORAGE_KEY,
-  ORDER_REDIRECT_KEY,
-  getOrderRepository,
-} from '../../utils/order-store';
+import { fetchOrderList } from '../../api/order';
+import { ORDER_REDIRECT_KEY } from '../../utils/order-store';
 
-const brandAvatar =
-  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=240&q=80';
+const brandAvatar = 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=240&q=80';
 
 const pageMode = ref('list');
 const activeFilter = ref('all');
@@ -232,57 +230,10 @@ const filters = [
   { key: 'completed', label: '已完成' },
 ];
 
-const defaultOrders = [
-  {
-    orderNo: 'UA-20230914-01',
-    filter: 'inProgress',
-    category: '空间规划设计',
-    projectName: '滨海别墅概念方案',
-    projectDesc: '包含平面布局、3D建模及初步材料建议',
-    price: '¥12,800.00',
-    actionText: '联系建筑师',
-    actionType: 'service',
-    statusLabel: '进行中',
-    statusClass: 'status-blue',
-    icon: 'architecture',
-    iconClass: 'icon-blue',
-    image: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=320&q=80',
-  },
-  {
-    orderNo: 'UA-20230822-04',
-    filter: 'completed',
-    category: '园林景观改造',
-    projectName: '私人住宅庭院景观',
-    projectDesc: '项目已于2023年9月5日交付完成',
-    price: '¥45,000.00',
-    actionText: '评价订单',
-    actionType: 'review',
-    statusLabel: '已完成',
-    statusClass: 'status-gray',
-    icon: 'home_work',
-    iconClass: 'icon-gray',
-    image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=320&q=80',
-  },
-  {
-    orderNo: 'UA-20230910-09',
-    filter: 'review',
-    category: '灯光氛围设计',
-    projectName: '光影交互体验设计',
-    projectDesc: '全屋智能灯光联动方案',
-    price: '¥8,500.00',
-    actionText: '立即评价',
-    actionType: 'review',
-    statusLabel: '待评价',
-    statusClass: 'status-warm',
-    icon: 'construction',
-    iconClass: 'icon-warm',
-    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=320&q=80',
-  },
-];
-
-const orderList = ref([...defaultOrders]);
+const orderList = ref([]);
 
 const activeOrder = ref({
+  orderId: '',
   orderNo: '#UA-8829-X1',
   eta: '预计12:45送达',
   payMethod: '微信支付',
@@ -323,6 +274,15 @@ const filteredOrders = computed(() => {
   return orderList.value.filter((item) => item.filter === activeFilter.value);
 });
 
+const getAddressLabel = (serviceType) => {
+  const map = { buy: '收货地址', send: '收件地址', task: '办理说明', universal: '需求概览' };
+  return map[serviceType] || '送达地址';
+};
+
+const getDetailLabel = (serviceLabel) => {
+  return serviceLabel ? `${serviceLabel}详情` : '物品详情';
+};
+
 const normalizeActiveOrder = (payload) => {
   if (!payload || typeof payload !== 'object') {
     return;
@@ -330,12 +290,12 @@ const normalizeActiveOrder = (payload) => {
 
   activeOrder.value = {
     orderNo: payload.orderNo || activeOrder.value.orderNo,
-    eta: payload.eta || activeOrder.value.eta,
-    payMethod: payload.payMethod || activeOrder.value.payMethod,
+    eta: payload.eta || payload.etaTitle || activeOrder.value.eta,
+    payMethod: payload.paymentMethod || activeOrder.value.payMethod,
     goods: payload.goods || activeOrder.value.goods,
-    addressLabel: payload.addressLabel || '送达地址',
-    detailLabel: payload.detailLabel || '物品详情',
-    listIcon: guessListIcon(payload.goods),
+    addressLabel: payload.addressLabel || getAddressLabel(payload.serviceType),
+    detailLabel: payload.detailLabel || getDetailLabel(payload.serviceLabel),
+    listIcon: guessListIcon(payload.serviceType),
     rider: {
       name: payload.rider?.name || activeOrder.value.rider.name,
       rating: payload.rider?.rating || activeOrder.value.rider.rating,
@@ -344,52 +304,51 @@ const normalizeActiveOrder = (payload) => {
     },
     steps: Array.isArray(payload.steps) && payload.steps.length ? payload.steps : activeOrder.value.steps,
     address: {
-      title: payload.address?.title || activeOrder.value.address.title,
-      detail: payload.address?.detail || activeOrder.value.address.detail,
+      title: payload.address?.title || payload.receiverTitle || activeOrder.value.address.title,
+      detail: payload.address?.detail || payload.receiverDetail || activeOrder.value.address.detail,
     },
   };
 };
 
-const guessListIcon = (goods) => {
-  const text = String(goods || '');
-  if (text.includes('送') || text.includes('快递')) {
-    return 'local_shipping';
-  }
-  if (text.includes('办') || text.includes('挂号')) {
-    return 'assignment';
-  }
-  if (text.includes('万能') || text.includes('需求')) {
-    return 'auto_awesome';
-  }
-  return 'shopping_bag';
+const guessListIcon = (serviceType) => {
+  const map = { buy: 'shopping_bag', send: 'local_shipping', task: 'assignment', universal: 'auto_awesome' };
+  return map[serviceType] || 'shopping_bag';
 };
 
-const syncOrderList = () => {
-  const repository = getOrderRepository();
-  const dynamicList = repository
-    .map((item) => item.listItem)
-    .filter(Boolean)
-    .map((item) => ({
+const getIconClass = (serviceType) => {
+  const map = { buy: 'icon-blue', send: 'icon-blue', task: 'icon-warm', universal: 'icon-gray' };
+  return map[serviceType] || 'icon-blue';
+};
+
+const getStatusClass = (status) => {
+  if (status === 'review') return 'status-warm';
+  if (status === 'completed' || status === 'cancelled') return 'status-gray';
+  return 'status-blue';
+};
+
+const loadOrders = async () => {
+  try {
+    const records = await fetchOrderList();
+    orderList.value = records.map((item) => ({
       ...item,
-      icon: item.icon || 'shopping_bag',
-      iconClass: item.iconClass || 'icon-blue',
-      statusClass: item.statusClass || 'status-blue',
-      image: item.image || defaultOrders[0].image,
+      icon: guessListIcon(item.serviceType),
+      iconClass: getIconClass(item.serviceType),
+      statusClass: getStatusClass(item.status),
+      priceText: typeof item.price === 'number' ? `¥${item.price.toFixed(2)}` : item.price,
     }));
 
-  const merged = [...dynamicList];
-  defaultOrders.forEach((item) => {
-    if (!merged.some((current) => current.orderNo === item.orderNo)) {
-      merged.push(item);
-    }
-  });
-  orderList.value = merged;
+    const currentActiveOrder = records.find((item) => item.status === 'in_progress');
+    normalizeActiveOrder(currentActiveOrder);
+  } catch (error) {
+    uni.showToast({
+      title: error?.message || '订单加载失败',
+      icon: 'none',
+    });
+  }
 };
 
 const syncActiveMode = () => {
   const redirect = uni.getStorageSync(ORDER_REDIRECT_KEY);
-  const cachedOrder = uni.getStorageSync(ACTIVE_ORDER_STORAGE_KEY);
-  normalizeActiveOrder(cachedOrder);
 
   if (redirect === 'delivery') {
     pageMode.value = 'delivery';
@@ -400,8 +359,8 @@ const syncActiveMode = () => {
   pageMode.value = 'list';
 };
 
-onShow(() => {
-  syncOrderList();
+onShow(async () => {
+  await loadOrders();
   syncActiveMode();
 });
 
@@ -415,9 +374,9 @@ const backToList = () => {
 
 const goDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/order/detail?orderNo=${encodeURIComponent(item.orderNo)}&projectName=${encodeURIComponent(
+    url: `/pages/order/detail?id=${encodeURIComponent(item.id)}&orderNo=${encodeURIComponent(item.orderNo)}&projectName=${encodeURIComponent(
       item.projectName,
-    )}&status=${encodeURIComponent(item.statusLabel)}&price=${encodeURIComponent(item.price)}`,
+    )}&status=${encodeURIComponent(item.statusLabel)}&price=${encodeURIComponent(item.priceText || item.price)}`,
   });
 };
 
@@ -426,7 +385,7 @@ const handleCardAction = (item) => {
     uni.navigateTo({
       url: `/pages/order/review?orderNo=${encodeURIComponent(item.orderNo)}&projectName=${encodeURIComponent(
         item.projectName,
-      )}&status=${encodeURIComponent(item.statusLabel)}&price=${encodeURIComponent(item.price)}`,
+      )}&status=${encodeURIComponent(item.statusLabel)}&price=${encodeURIComponent(item.priceText || item.price)}`,
     });
     return;
   }
