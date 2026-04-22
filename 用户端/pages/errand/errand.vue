@@ -109,6 +109,7 @@
 
 <script setup>
 import { computed, reactive } from 'vue';
+import LocalIcon from '../../components/LocalIcon.vue';
 import { buildCommonOrderRecord, submitOrderRecord } from '../../utils/order-store';
 
 const avatarUrl = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&q=80';
@@ -241,7 +242,7 @@ const submitErrand = () => {
   });
 
   submitOrderRecord(orderRecord);
-  uni.switchTab({
+  uni.reLaunch({
     url: '/pages/order/order',
   });
 };
@@ -272,10 +273,13 @@ const goBack = () => {
   z-index: 30;
   height: 66px;
   padding: 0 14px;
+  padding-top: var(--status-bar-height, env(safe-area-inset-top));
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: rgba(242, 243, 245, 0.92);
+  backdrop-filter: blur(24px);
 }
 
 .top-back {
@@ -287,9 +291,9 @@ const goBack = () => {
 }
 
 .top-back-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1747d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .top-title {
@@ -356,9 +360,9 @@ const goBack = () => {
   position: absolute;
   right: 18px;
   bottom: -4px;
-  font-size: 120px;
-  color: rgba(160, 170, 255, 0.28);
-  font-variation-settings: 'FILL' 1;
+  width: 120px;
+  height: 120px;
+  opacity: 0.28;
 }
 
 .panel {
@@ -375,9 +379,9 @@ const goBack = () => {
 }
 
 .panel-head-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .panel-head-title {
@@ -450,9 +454,9 @@ const goBack = () => {
 }
 
 .selector-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .selector-copy {
@@ -476,7 +480,8 @@ const goBack = () => {
 }
 
 .selector-arrow {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #7f8695;
 }
 

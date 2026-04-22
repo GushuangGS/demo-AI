@@ -19,3 +19,13 @@
 - 已完成三个服务页的表单校验、按钮禁用、订单缓存写入与提交后跳转订单页联动。
 - 已新增统一订单仓库 `utils/order-store.js`，四类订单提交现统一写仓库。
 - 已重构 `pages/order/detail.vue`，按订单类型展示不同详情内容，并保留本地持久化字段。
+
+## 2026-04-22
+
+- 已读取 `首页`、`我的`、`订单` 三组原型图与 HTML，确认需补做三个真正的根页面。
+- 已将 `pages.json` 从仅有首页的状态扩展为完整页面注册，补齐 `buy/send/errand/all/order/mine` 等页面路由。
+- 已按原型重写 `pages/index/index.vue`，实现品牌头部、服务宫格、快速预约、附近跑男、状态卡与自定义底部导航。
+- 已新增 `pages/order/order.vue`，实现“我的订单”列表态与“进行中订单”态，并接入订单仓库缓存。
+- 已新增 `pages/mine/mine.vue`，实现未登录态个人中心、功能卡片、招募横幅、菜单列表与自定义底部导航。
+- 已将 `buy.vue`、`send.vue`、`errand.vue`、`all.vue` 的返回订单页动作从 `switchTab` 改为 `reLaunch`，兼容当前自定义底部导航方案。
+- 已对 `pages/index/index.vue`、`pages/mine/mine.vue`、`pages/order/order.vue`、`pages/buy/buy.vue`、`pages.json` 运行诊断，未发现新增语法错误。

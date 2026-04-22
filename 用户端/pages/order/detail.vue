@@ -6,8 +6,8 @@
           <LocalIcon class="back-icon" name="arrow_back" />
         </view>
         <text class="top-title">订单详情</text>
-        <view class="share-action" @click="shareOrder">
-          <LocalIcon class="share-icon" name="share" />
+        <view>
+          <!-- <LocalIcon class="share-icon" name="share" /> -->
         </view>
       </view>
 
@@ -195,6 +195,8 @@
 </template>
 
 <script setup>
+import LocalIcon from '@/components/LocalIcon.vue';
+
 import { computed, reactive } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { getOrderRecordByNo } from '../../utils/order-store';
@@ -336,6 +338,8 @@ const goReview = () => {
   z-index: 20;
   height: 60px;
   padding: 0 16px;
+  padding-top: var(--status-bar-height, env(safe-area-inset-top));
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -356,6 +360,8 @@ const goReview = () => {
 
 .back-icon,
 .share-icon {
+  width: 20px;
+  height: 20px;
   font-size: 20px;
   color: #1847d7;
   font-variation-settings: 'FILL' 1;

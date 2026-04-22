@@ -28,9 +28,16 @@
 | 15   | complete | 诊断检查与记录更新                     |
 | 16   | complete | 建立统一本地订单仓库并接入四类订单     |
 | 17   | complete | 重构订单详情页为按类型展示             |
+| 18   | complete | 按首页原型重构 `pages/index/index.vue`  |
+| 19   | complete | 新增并接入 `pages/order/order.vue` 根页 |
+| 20   | complete | 新增并接入 `pages/mine/mine.vue` 根页  |
+| 21   | complete | 完善 `pages.json` 与全局页面注册        |
+| 22   | complete | 将业务页返回链路调整为 `reLaunch`      |
+| 23   | complete | 页面诊断检查与收尾                     |
 
 ## 风险与注意
 
 - 需要保留用户最近对 `order.vue` 的修改，不覆盖已有跳转逻辑。
 - 当前项目没有现成“帮我买”页面，需新增页面并补路由。
 - 若要让订单页提交后直接展示“进行中”，需确认使用页面参数、缓存还是全局状态。
+- 若使用官方 `tabBar` 才能 `switchTab`，但会与设计稿中的自定义底部导航冲突，因此本轮统一改为 `reLaunch` 跳转根页。

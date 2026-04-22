@@ -1,152 +1,153 @@
 <template>
   <view class="page">
     <view class="page-shell">
-      <view class="top-bar bg-glass">
-        <text class="brand-name">Urban Architect</text>
-        <image
-          class="profile-avatar"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9sve-wEPYIXTF7DfqPPa6qc_CVthX1AD85b2vPbjr_EeY6f30aVJSLvhl4yEjvTjT-kL3t6197LbZxDwUEYuNhbExJB29v5Q77_Ikt6pUDc5nxWLtASOOEnk5a3hsiv7BjeIGZGz5-RnSv5gHwu-v6cAnIdgfLqFqKmEG04aAkkSiR3gepSn6x_o0azAZjf4Ylad6CuDvEYp1d0ehXnaR5SyTQhUXlM_CA0DfpjAADEqk1Ojti5mM0zvp4E2_JokO0kNniTqJfyQ"
-          mode="aspectFill"
-        />
+      <view class="top-bar">
+        <view class="brand-group">
+          <LocalIcon class="brand-menu" name="menu" />
+          <text class="brand-title">UrbanArchitect</text>
+        </view>
+        <image class="brand-avatar" :src="heroAvatar" mode="aspectFill" />
       </view>
 
-      <view class="content">
-        <view class="hero-block">
-          <text class="hero-title">
-            欢迎回来，
-            <text class="hero-title-primary">张先生</text>
-          </text>
-          <text class="hero-subtitle">您的城市生活建筑师。无论买、送、办，我们随时待命。</text>
-
-          <view class="search-box">
-            <LocalIcon class="search-icon" name="search" />
-            <input class="search-input" placeholder="搜寻附近的服务或快递员..." type="text" />
-          </view>
-        </view>
-
-        <view class="service-grid">
-          <view
-            v-for="item in services"
-            :key="item.title"
-            class="service-card"
-            :class="[item.cardClass, { 'service-card-active': activeService?.title === item.title }]"
-            @tap="handleServiceCardTap(item)"
-          >
-            <view class="service-icon-box" :class="item.iconClass">
-              <LocalIcon class="service-icon" :name="item.icon" />
+      <scroll-view scroll-y class="page-scroll">
+        <view class="content">
+          <view class="hero-section">
+            <text class="hero-title">欢迎回来，</text>
+            <view class="hero-title-row">
+              <text class="hero-title">张先生</text>
             </view>
-            <text class="service-title" :class="{ 'service-title-light': item.highlight }">
-              {{ item.title }}
-            </text>
-            <view class="service-copy">
-              <text class="service-copy-line" :class="{ 'service-copy-light': item.highlight }">
-                {{ item.descTop }}
-              </text>
-              <text class="service-copy-line" :class="{ 'service-copy-light': item.highlight }">
-                {{ item.descBottom }}
-              </text>
-            </view>
-            <LocalIcon class="service-mark" :class="{ 'service-mark-light': item.highlight }" :name="item.bgIcon" />
-          </view>
-        </view>
+            <text class="hero-desc">您的城市生活建筑师。无论买、送、办，我们随时待命。</text>
 
-        <view class="section-block">
-          <view class="section-head">
+            <view class="search-box">
+              <LocalIcon class="search-icon" name="search" />
+              <input
+                class="search-input"
+                placeholder="搜寻附近的服务或快递员..."
+                placeholder-class="search-placeholder"
+              />
+            </view>
+          </view>
+
+          <view class="service-grid">
+            <view
+              v-for="item in services"
+              :key="item.title"
+              class="service-card"
+              :class="[item.cardClass, selectedService === item.key ? 'service-card-selected' : '']"
+              @tap="handleServiceTap(item)"
+            >
+              <view class="service-icon-box" :class="item.iconBoxClass">
+                <LocalIcon class="service-icon" :name="item.icon" />
+              </view>
+              <text class="service-title" :class="item.light ? 'service-title-light' : ''">{{ item.title }}</text>
+              <text class="service-desc" :class="item.light ? 'service-desc-light' : ''">{{ item.desc }}</text>
+              <LocalIcon class="service-bg-icon" :name="item.bgIcon" />
+            </view>
+          </view>
+
+          <view class="section-header">
             <text class="section-title">快速预约</text>
-            <view class="section-link">
-              <text class="section-link-text">历史地址</text>
-              <LocalIcon class="section-link-icon" name="history" />
+            <view class="section-action" @tap="showHistory">
+              <text class="section-action-text">历史地址</text>
+              <LocalIcon class="section-action-icon" name="history" />
             </view>
           </view>
 
-          <view class="booking-card">
-            <view class="field-group">
+          <view class="quick-card">
+            <view class="form-field">
               <text class="field-label">取货地址</text>
               <view class="field-box">
-                <LocalIcon class="field-icon field-icon-primary" name="location_on" />
-                <input class="field-input" type="text" value="北京市朝阳区三里屯SOHO 5号楼" />
+                <LocalIcon class="field-icon" name="location_on" />
+                <input v-model="quickForm.pickupAddress" class="field-input" />
               </view>
             </view>
 
-            <view class="field-group field-group-gap">
+            <view class="form-field">
               <text class="field-label">收货地址</text>
               <view class="field-box">
-                <LocalIcon class="field-icon field-icon-tertiary" name="near_me" />
-                <input class="field-input" placeholder="输入收货地址..." type="text" />
+                <LocalIcon class="field-icon field-icon-warm" name="near_me" />
+                <input
+                  v-model="quickForm.deliveryAddress"
+                  class="field-input"
+                  placeholder="输入收货地址..."
+                  placeholder-class="field-placeholder"
+                />
               </view>
             </view>
 
             <view class="tag-list">
-              <text v-for="tag in orderTags" :key="tag" class="tag-chip">{{ tag }}</text>
+              <view
+                v-for="tag in goodsTags"
+                :key="tag"
+                class="tag-item"
+                :class="activeTag === tag ? 'tag-item-active' : ''"
+                @tap="activeTag = tag"
+              >
+                <text class="tag-text" :class="activeTag === tag ? 'tag-text-active' : ''">{{ tag }}</text>
+              </view>
             </view>
 
-            <button class="primary-button" @tap="handlePrimaryBooking">立即呼叫服务</button>
+            <button class="primary-button" @tap="submitQuickOrder">立即呼叫服务</button>
           </view>
-        </view>
 
-        <view class="section-block nearby-block">
-          <view class="section-head">
+          <view class="section-header section-header-tight">
             <text class="section-title">附近跑男</text>
-            <text class="online-pill">12人在岗</text>
+            <view class="online-pill">12人在线</view>
           </view>
 
           <view class="courier-list">
-            <view v-for="courier in couriers" :key="courier.name" class="courier-card">
-              <view class="courier-main">
-                <view class="courier-avatar-wrap">
-                  <image class="courier-avatar" :src="courier.avatar" mode="aspectFill" />
-                  <view class="courier-status"></view>
-                </view>
+            <view v-for="item in couriers" :key="item.name" class="courier-card">
+              <view class="courier-avatar-wrap">
+                <image class="courier-avatar" :src="item.avatar" mode="aspectFill" />
+                <view class="courier-dot"></view>
+              </view>
 
-                <view class="courier-detail">
-                  <view class="courier-topline">
-                    <text class="courier-name">{{ courier.name }}</text>
-                    <view class="courier-rating">
-                      <LocalIcon class="courier-star" name="star" />
-                      <text class="courier-score">{{ courier.score }}</text>
-                    </view>
+              <view class="courier-main">
+                <view class="courier-top">
+                  <text class="courier-name">{{ item.name }}</text>
+                  <view class="courier-rating">
+                    <LocalIcon class="courier-star" name="star" />
+                    <text class="courier-rating-text">{{ item.rating }}</text>
                   </view>
-                  <text class="courier-meta">{{ courier.meta }}</text>
-                  <view class="courier-tags">
-                    <text v-for="tag in courier.tags" :key="tag" class="courier-tag">{{ tag }}</text>
-                  </view>
+                </view>
+                <text class="courier-meta">距离 {{ item.distance }} | 已接 {{ item.completed }} 单</text>
+                <view class="courier-tags">
+                  <text v-for="tag in item.tags" :key="tag" class="courier-tag">{{ tag }}</text>
                 </view>
               </view>
             </view>
           </view>
 
-          <button class="map-button">查看地图上的人员</button>
-        </view>
+          <view class="map-button" @tap="showMap">查看地图上的人员</view>
 
-        <view class="delivery-status">
-          <view class="delivery-status-main">
-            <view class="delivery-status-dot"></view>
-            <view class="delivery-status-copy">
-              <text class="delivery-status-title">最近订单正在配送中</text>
-              <text class="delivery-status-desc">文件速递 · 预计 14:35 送达</text>
+          <view class="status-card" @tap="openOrderPage">
+            <view class="status-left">
+              <view class="status-orb"></view>
+              <view>
+                <text class="status-title">最近订单正在配送中</text>
+                <text class="status-desc">文件快递 • 预计 14:35 送达</text>
+              </view>
             </view>
+            <view class="status-button">追踪位置</view>
           </view>
-          <button class="track-button">立即查看</button>
         </view>
-      </view>
+      </scroll-view>
     </view>
 
-    <view class="tab-bar bg-glass">
-      <view class="tab-item tab-item-active" @click="switchTab('/pages/index/index')">
+    <view class="tab-bar">
+      <view class="tab-item tab-item-active" @tap="openRootPage('/pages/index/index')">
         <view class="tab-icon-box tab-icon-box-active">
           <LocalIcon class="tab-icon" name="calendar_month" />
         </view>
         <text class="tab-text tab-text-active">预约</text>
       </view>
-
-      <view class="tab-item" @click="switchTab('/pages/order/order')">
+      <view class="tab-item" @tap="openRootPage('/pages/order/order')">
         <view class="tab-icon-box">
           <LocalIcon class="tab-icon" name="receipt_long" />
         </view>
         <text class="tab-text">订单</text>
       </view>
-
-      <view class="tab-item" @click="switchTab('/pages/mine/mine')">
+      <view class="tab-item" @tap="openRootPage('/pages/mine/mine')">
         <view class="tab-icon-box">
           <LocalIcon class="tab-icon" name="person" />
         </view>
@@ -157,634 +158,646 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import LocalIcon from '@/components/LocalIcon.vue';
+
+import { reactive, ref } from 'vue';
+
+const heroAvatar = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80';
+
+const quickForm = reactive({
+  pickupAddress: '北京市朝阳区三里屯SOHO 5号楼',
+  deliveryAddress: '',
+});
+
+const goodsTags = ['手机数码', '文件合同', '钥匙配饰', '+ 自定义物品'];
+const activeTag = ref('钥匙配饰');
+const selectedService = ref('all');
 
 const services = [
   {
+    key: 'buy',
     title: '帮我买',
-    descTop: '餐饮、生鲜、药品',
-    descBottom: '30分钟送达',
+    desc: '餐饮、生鲜、药品\n30分钟送达',
     icon: 'shopping_bag',
     bgIcon: 'shopping_cart',
-    cardClass: 'service-card-buy',
-    iconClass: 'service-icon-buy',
-    highlight: false,
     path: '/pages/buy/buy',
+    cardClass: 'service-card-soft',
+    iconBoxClass: 'service-icon-box-primary',
+    light: false,
   },
   {
+    key: 'send',
     title: '帮我送',
-    descTop: '急件、鲜花、蛋糕',
-    descBottom: '全城专人直送',
+    desc: '急件、鲜花、蛋糕\n全城专人直送',
     icon: 'local_shipping',
     bgIcon: 'package_2',
-    cardClass: 'service-card-send',
-    iconClass: 'service-icon-send',
-    highlight: false,
     path: '/pages/send/send',
+    cardClass: 'service-card-soft',
+    iconBoxClass: 'service-icon-box-purple',
+    light: false,
   },
   {
+    key: 'errand',
     title: '帮我办',
-    descTop: '排队、挂号、代取',
-    descBottom: '节省您的每一分钟',
+    desc: '排队、挂号、代取\n节省您的每一分钟',
     icon: 'assignment',
     bgIcon: 'task',
-    cardClass: 'service-card-do',
-    iconClass: 'service-icon-do',
-    highlight: false,
     path: '/pages/errand/errand',
+    cardClass: 'service-card-soft',
+    iconBoxClass: 'service-icon-box-warm',
+    light: false,
   },
   {
+    key: 'all',
     title: '万能帮',
-    descTop: '各种个性化需求',
-    descBottom: '只有想不到，没有做不到',
+    desc: '各种个性化需求\n只有想不到，没有做不到',
     icon: 'auto_awesome',
     bgIcon: 'magic_button',
-    cardClass: 'service-card-all',
-    iconClass: 'service-icon-all',
-    highlight: true,
     path: '/pages/all/all',
+    cardClass: 'service-card-strong',
+    iconBoxClass: 'service-icon-box-white',
+    light: true,
   },
 ];
-
-const activeServiceTitle = ref('帮我买');
-const activeService = computed(() => services.find((item) => item.title === activeServiceTitle.value) || services[0]);
-
-const orderTags = ['手机数码', '文件合同', '钥匙配饰', '+ 自定义物品'];
 
 const couriers = [
   {
     name: '王师傅',
-    score: '4.9',
-    meta: '距您 500m | 已送 2.4k 单',
-    tags: ['准时达', '好评高'],
-    avatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuB9s1Q218GYts49tw3dJdDAKx_WFhr3j0PrdPyFp6BytJmk3GosTQJpd1I2l_-gBm_BXSqXp-zlt8WBBI95tZqlW4-o7aEPnjqRhwkjAO0wTeH44IkWPK8NsQd1bYaCfMns92TCbuCVSbdCrrHcdO6Kr9KmY8CiI55DooLTNPTb1PX2bPSCblUp2JydgsELXMspLNj4_n9pdLbWaP3N1TbbyeFCeQ0MOvkMhm8fH3hF6chby3u4bWP4zur-kKg5qi9wWS56QAAOtis',
+    avatar: 'https://images.unsplash.com/photo-1541534401786-2077eed87a72?auto=format&fit=crop&w=240&q=80',
+    distance: '500m',
+    completed: '2.4k',
+    rating: '4.9',
+    tags: ['准时达', '好评如潮'],
   },
   {
     name: '李师傅',
-    score: '4.8',
-    meta: '距您 1.2km | 已送 1.8k 单',
-    tags: ['熟悉路线', '服务周到'],
-    avatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuApwY8seJM0qJvyBT-hjf1syEYderUuCTXD90H_cqEizaCs0kuv7UU4cF3YF1ltllN5ttjClcNLcrF-mjAav9Z-vE5Sg7HFUOrOK2KXrYp7b7O5h3hh2ZnAK_Nu8XM4VADohpQQzvOusL0q94tx9hO75CAEfyCIxSGVZP0LEriUl-nHWRRIl05Vucd1obVeQyZUgPWU94RMCiSXsikDiPwQoAbD0ACZzKW7uxfmMyENYJuOg2s35dZvUxmKtvDfsT7wS-0syMZ2XRE',
+    avatar: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=240&q=80',
+    distance: '1.2km',
+    completed: '1.8k',
+    rating: '4.8',
+    tags: ['熟路', '服务周到'],
   },
   {
     name: '赵师傅',
-    score: '5.0',
-    meta: '距您 2.1km | 已送 3.2k 单',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=240&q=80',
+    distance: '2.1km',
+    completed: '3.2k',
+    rating: '5.0',
     tags: ['金牌服务'],
-    avatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuA2uBZreSE4H06taWABfExdDNB8CD8dsOLHAtTKT8L7gtoqGub5jNm7PmBbPMrSbja2mTWbNtA_m8FT-IG8krCDpg0iEBZ9Fqzsh_0Vt2ICzO1VqBiDwE0PDzHEszjJwXrmei8X6jE6Acv7FdI7wRkElMrEORq9xvSboaX7tk02-ZmmN5aHRA09POGDf-qgklynI-rsEyig0lLD28Cwg9rIyH2-RIY6EWcc1w7_tEPRynyU6_zhgkwMM9TBNDTnYj92ZGTSFZevdSE',
   },
 ];
 
-onMounted(() => {
-  uni.hideTabBar();
-});
-
-const handleServiceCardTap = (item) => {
-  activeServiceTitle.value = item.title;
-  handleServiceAction(item);
+const openRootPage = (url) => {
+  uni.reLaunch({ url });
 };
 
-const handlePrimaryBooking = () => {
-  handleServiceAction(activeService.value);
+const handleServiceTap = (item) => {
+  selectedService.value = item.key;
+  uni.navigateTo({ url: item.path });
 };
 
-const handleServiceAction = (item) => {
-  if (item.path) {
-    uni.navigateTo({
-      url: item.path,
-      fail: () => {
-        uni.showToast({
-          title: '页面跳转失败',
-          icon: 'none',
-        });
-      },
-    });
-    return;
-  }
+const submitQuickOrder = () => {
+  const target = services.find((item) => item.key === selectedService.value) || services[3];
+  uni.navigateTo({ url: target.path });
+};
 
+const showHistory = () => {
   uni.showToast({
-    title: `${item.title}功能待接入`,
+    title: '历史地址功能待接入',
     icon: 'none',
   });
 };
 
-const switchTab = (url) => {
-  uni.switchTab({ url });
+const showMap = () => {
+  uni.showToast({
+    title: '地图能力待接入',
+    icon: 'none',
+  });
+};
+
+const openOrderPage = () => {
+  openRootPage('/pages/order/order');
 };
 </script>
 
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #f4f6fb;
+  background: #f2f3f5;
   color: #191c1e;
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .page-shell {
   width: 100%;
-  max-width: 390px;
+  max-width: 430px;
   margin: 0 auto;
   min-height: 100vh;
-  position: relative;
+  padding-bottom: 112px;
+  box-sizing: border-box;
+}
+
+.page-scroll {
+  height: 100vh;
 }
 
 .top-bar {
+  padding-top: var(--status-bar-height, env(safe-area-inset-top));
+  box-sizing: content-box;
   position: sticky;
   top: 0;
   z-index: 30;
+  height: 74px;
+  padding: 48px 18px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 12px 10px;
-  background: rgba(244, 246, 251, 0.82);
+  background: rgba(242, 243, 245, 0.96);
+  box-sizing: border-box;
 }
 
-.brand-name {
-  font-size: 14px;
+.brand-group {
+  display: flex;
+  align-items: center;
+}
+
+.brand-menu {
+  width: 22px;
+  height: 22px;
+}
+
+.brand-title {
+  margin-left: 14px;
+  font-size: 20px;
   font-weight: 800;
-  color: #1d46c2;
-  letter-spacing: -0.03em;
+  color: #1847d7;
 }
 
-.profile-avatar {
-  width: 34px;
-  height: 34px;
+.brand-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
-  box-shadow: 0 6px 18px rgba(25, 28, 30, 0.08);
 }
 
 .content {
-  padding: 4px 12px calc(124px + env(safe-area-inset-bottom));
+  padding: 0 14px 24px;
 }
 
-.hero-block {
-  padding-top: 4px;
+.hero-section {
+  padding-top: 10px;
+}
+
+.hero-title,
+.hero-title-row {
+  display: block;
 }
 
 .hero-title {
-  display: block;
-  font-size: 17px;
-  line-height: 1.35;
+  font-size: 24px;
+  line-height: 1.2;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  color: #11161f;
 }
 
-.hero-title-primary {
-  color: #1848d7;
+.hero-title-row .hero-title {
+  color: #1545d5;
 }
 
-.hero-subtitle {
+.hero-desc {
   display: block;
-  margin-top: 10px;
-  color: #5c6172;
-  font-size: 11px;
+  margin-top: 12px;
+  font-size: 13px;
   line-height: 1.7;
-  padding-right: 6px;
+  color: #6c7484;
 }
 
 .search-box {
-  margin-top: 16px;
-  position: relative;
-  height: 48px;
-  border-radius: 14px;
+  margin-top: 18px;
+  height: 56px;
+  border-radius: 18px;
   background: #e7e9ee;
   display: flex;
   align-items: center;
-  padding: 0 14px 0 40px;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
 .search-icon {
-  position: absolute;
-  left: 14px;
-  font-size: 18px;
-  color: #244dd4;
+  width: 18px;
+  height: 18px;
 }
 
 .search-input {
-  width: 100%;
-  height: 48px;
-  font-size: 11px;
-  color: #191c1e;
-  background: transparent;
-  border: none;
+  flex: 1;
+  margin-left: 12px;
+  font-size: 13px;
+  color: #1d2128;
+}
+
+.search-placeholder,
+.field-placeholder {
+  color: #9ba2af;
 }
 
 .service-grid {
-  margin-top: 22px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .service-card {
   position: relative;
   overflow: hidden;
-  min-height: 128px;
-  padding: 16px 12px 14px;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  width: calc(50% - 7px);
+  min-height: 164px;
+  margin-bottom: 14px;
+  padding: 18px 16px;
+  border-radius: 24px;
+  box-sizing: border-box;
 }
 
-.service-card-active {
-  outline: 2px solid rgba(28, 71, 214, 0.18);
-  box-shadow: 0 12px 24px rgba(28, 71, 214, 0.08);
+.service-card-selected {
+  transform: translateY(-2px);
 }
 
-.service-card-buy,
-.service-card-send,
-.service-card-do {
-  background: #eceef2;
+.service-card-soft {
+  background: #e8e9ed;
 }
 
-.service-card-all {
-  background: linear-gradient(180deg, #2d57e8 0%, #1a47d7 100%);
+.service-card-strong {
+  background: linear-gradient(180deg, #2b58dc 0%, #1745d7 100%);
 }
 
 .service-icon-box {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.service-icon-buy {
+.service-icon-box-primary {
   background: #dbe2ff;
-  color: #2448c7;
 }
 
-.service-icon-send {
-  background: #c8d0ff;
-  color: #4c5b95;
+.service-icon-box-purple {
+  background: #dce0ff;
 }
 
-.service-icon-do {
-  background: #ffd9cc;
-  color: #8a330f;
+.service-icon-box-warm {
+  background: #ffdcd3;
 }
 
-.service-icon-all {
-  background: #dce1ff;
-  color: #214bd9;
+.service-icon-box-white {
+  background: #eef1ff;
 }
 
 .service-icon {
-  font-size: 18px;
-  font-variation-settings: 'FILL' 1;
+  width: 20px;
+  height: 20px;
 }
 
 .service-title {
-  margin-top: 18px;
-  font-size: 13px;
+  display: block;
+  margin-top: 28px;
+  font-size: 18px;
   font-weight: 800;
+  color: #1a2028;
 }
 
 .service-title-light {
   color: #ffffff;
 }
 
-.service-copy {
-  margin-top: 8px;
-  position: relative;
-  z-index: 2;
-}
-
-.service-copy-line {
+.service-desc {
   display: block;
-  font-size: 10px;
-  line-height: 1.6;
-  color: #616678;
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.65;
+  color: #707888;
+  white-space: pre-line;
 }
 
-.service-copy-light {
-  color: #dce2ff;
+.service-desc-light {
+  color: rgba(235, 240, 255, 0.82);
 }
 
-.service-mark {
+.service-bg-icon {
   position: absolute;
-  right: -8px;
-  bottom: -10px;
-  font-size: 58px;
-  color: rgba(25, 28, 30, 0.08);
-  z-index: 1;
+  right: 10px;
+  bottom: 8px;
+  width: 56px;
+  height: 56px;
+  opacity: 0.12;
 }
 
-.service-mark-light {
-  color: rgba(255, 255, 255, 0.28);
-}
-
-.section-block {
-  margin-top: 26px;
-}
-
-.section-head {
+.section-header {
+  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+}
+
+.section-header-tight {
+  margin-top: 18px;
 }
 
 .section-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  color: #151922;
 }
 
-.section-link {
+.section-action {
   display: flex;
   align-items: center;
-  gap: 2px;
 }
 
-.section-link-text {
-  font-size: 10px;
+.section-action-text {
+  font-size: 11px;
   font-weight: 700;
-  color: #2448c7;
+  color: #1847d7;
 }
 
-.section-link-icon {
-  font-size: 12px;
-  color: #2448c7;
+.section-action-icon {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
 }
 
-.booking-card {
-  background: #f6f6f7;
-  border-radius: 20px;
-  padding: 16px;
+.quick-card {
+  margin-top: 12px;
+  border-radius: 24px;
+  background: #f8f8f9;
+  padding: 18px 16px;
+  box-shadow: 0 12px 28px rgba(20, 28, 40, 0.05);
 }
 
-.field-group-gap {
+.form-field + .form-field {
   margin-top: 14px;
 }
 
 .field-label {
   display: block;
   margin-bottom: 8px;
-  font-size: 10px;
-  font-weight: 800;
-  color: #2d3037;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5f6778;
 }
 
 .field-box {
-  min-height: 46px;
-  border-radius: 14px;
-  background: #e7e9ee;
+  height: 50px;
+  border-radius: 16px;
+  background: #ebedf1;
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 14px;
+  box-sizing: border-box;
 }
 
 .field-icon {
-  font-size: 17px;
-  margin-right: 8px;
+  width: 18px;
+  height: 18px;
 }
 
-.field-icon-primary {
-  color: #1c47d6;
-}
-
-.field-icon-tertiary {
-  color: #9b3b17;
+.field-icon-warm {
+  opacity: 0.7;
 }
 
 .field-input {
   flex: 1;
-  font-size: 10px;
-  color: #3c4150;
-  background: transparent;
-  border: none;
+  margin-left: 10px;
+  font-size: 13px;
+  color: #1b1f27;
 }
 
 .tag-list {
+  margin-top: 14px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
 }
 
-.tag-chip {
-  padding: 6px 10px;
+.tag-item {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
   border-radius: 999px;
-  background: #eef0f4;
-  color: #5d6474;
-  font-size: 9px;
+  background: #eceef2;
+}
+
+.tag-item-active {
+  background: #dce3ff;
+}
+
+.tag-text {
+  font-size: 10px;
   font-weight: 700;
+  color: #616978;
+}
+
+.tag-text-active {
+  color: #1847d7;
 }
 
 .primary-button {
-  margin-top: 16px;
-  width: 100%;
-  height: 46px;
+  margin-top: 10px;
+  height: 52px;
+  border-radius: 16px;
   border: none;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #1847d7 0%, #0d3ecf 100%);
+  background: linear-gradient(180deg, #1d49d8 0%, #113fd1 100%);
   color: #ffffff;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
-  line-height: 46px;
+  line-height: 52px;
 }
 
 .online-pill {
-  padding: 4px 8px;
+  min-width: 66px;
+  height: 24px;
+  padding: 0 10px;
   border-radius: 999px;
-  background: #eef0f4;
-  color: #6b6f80;
-  font-size: 9px;
-  font-weight: 700;
+  background: #eceef2;
+  text-align: center;
+  font-size: 10px;
+  line-height: 24px;
+  color: #6a7280;
+  box-sizing: border-box;
 }
 
 .courier-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  margin-top: 10px;
 }
 
 .courier-card {
-  background: #f5f6f8;
-  border-radius: 18px;
-  padding: 10px 10px 10px 8px;
-}
-
-.courier-main {
+  margin-bottom: 12px;
+  border-radius: 22px;
+  background: #f8f8f9;
+  padding: 14px;
   display: flex;
-  align-items: center;
+  box-shadow: 0 10px 24px rgba(20, 28, 40, 0.04);
 }
 
 .courier-avatar-wrap {
   position: relative;
-  width: 46px;
-  height: 46px;
-  margin-right: 10px;
 }
 
 .courier-avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
 }
 
-.courier-status {
+.courier-dot {
   position: absolute;
-  right: -1px;
-  bottom: -1px;
-  width: 10px;
-  height: 10px;
+  right: -2px;
+  bottom: -2px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #2bc160;
-  border: 2px solid #f5f6f8;
+  border: 2px solid #ffffff;
+  background: #36c15c;
 }
 
-.courier-detail {
+.courier-main {
   flex: 1;
-  min-width: 0;
+  margin-left: 12px;
 }
 
-.courier-topline {
+.courier-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .courier-name {
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 800;
-  color: #22252c;
+  color: #1a2028;
 }
 
 .courier-rating {
   display: flex;
   align-items: center;
-  color: #1847d7;
 }
 
 .courier-star {
-  font-size: 11px;
-  font-variation-settings: 'FILL' 1;
+  width: 13px;
+  height: 13px;
 }
 
-.courier-score {
-  margin-left: 2px;
-  font-size: 10px;
+.courier-rating-text {
+  margin-left: 4px;
+  font-size: 11px;
   font-weight: 800;
+  color: #1847d7;
 }
 
 .courier-meta {
   display: block;
-  margin-top: 3px;
-  color: #7a7f8d;
-  font-size: 9px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #727a89;
 }
 
 .courier-tags {
-  display: flex;
-  gap: 4px;
-  margin-top: 6px;
-  flex-wrap: wrap;
+  margin-top: 8px;
 }
 
 .courier-tag {
-  padding: 3px 6px;
+  display: inline-block;
+  margin-right: 6px;
+  margin-bottom: 4px;
+  padding: 3px 8px;
   border-radius: 999px;
-  background: #dce2ff;
-  color: #3f4c87;
-  font-size: 8px;
+  background: #dce3ff;
+  font-size: 9px;
   font-weight: 700;
+  color: #1847d7;
 }
 
 .map-button {
-  margin-top: 14px;
-  width: 100%;
-  height: 42px;
-  border-radius: 14px;
-  background: transparent;
-  border: 1px solid rgba(196, 197, 215, 0.65);
-  color: #4f5463;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 42px;
+  height: 52px;
+  margin-top: 4px;
+  border-radius: 18px;
+  border: 1px solid #cfd4df;
+  text-align: center;
+  font-size: 12px;
+  line-height: 52px;
+  color: #49505f;
 }
 
-.delivery-status {
+.status-card {
   margin-top: 18px;
-  border-radius: 18px;
-  background: #f3f4f7;
-  padding: 14px 12px;
+  padding: 18px 16px;
+  border-radius: 24px;
+  background: #f8f8f9;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
 }
 
-.delivery-status-main {
+.status-left {
   display: flex;
   align-items: center;
-  min-width: 0;
+  flex: 1;
 }
 
-.delivery-status-dot {
-  width: 7px;
-  height: 7px;
+.status-orb {
+  width: 8px;
+  height: 8px;
+  margin-right: 12px;
   border-radius: 50%;
-  background: #2450db;
-  box-shadow: 0 0 0 4px rgba(36, 80, 219, 0.12);
-  animation: pulse 2s infinite;
+  background: #1847d7;
+  box-shadow: 0 0 0 6px rgba(24, 71, 215, 0.14);
 }
 
-.delivery-status-copy {
-  min-width: 0;
-  margin-left: 12px;
-}
-
-.delivery-status-title {
+.status-title {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
-  color: #2a2d34;
+  color: #1a2028;
 }
 
-.delivery-status-desc {
+.status-desc {
   display: block;
   margin-top: 4px;
-  font-size: 9px;
-  color: #7a7f8d;
+  font-size: 10px;
+  color: #79808d;
 }
 
-.track-button {
-  flex-shrink: 0;
+.status-button {
+  min-width: 70px;
   height: 28px;
+  margin-left: 12px;
   padding: 0 12px;
   border-radius: 999px;
-  border: none;
-  background: #dfe5ff;
-  color: #1c47d6;
-  font-size: 9px;
-  font-weight: 800;
+  background: #dbe2ff;
+  text-align: center;
+  font-size: 10px;
   line-height: 28px;
+  color: #1847d7;
+  font-weight: 700;
+  box-sizing: border-box;
 }
 
 .tab-bar {
   position: fixed;
   left: 50%;
-  bottom: calc(10px + env(safe-area-inset-bottom));
+  bottom: 0;
+  z-index: 40;
+  width: 100%;
+  max-width: 430px;
   transform: translateX(-50%);
-  width: calc(100% - 24px);
-  max-width: 366px;
-  padding: 8px 8px 10px;
-  border-radius: 20px;
-  background: rgba(249, 250, 252, 0.94);
-  box-shadow: 0 10px 32px rgba(25, 28, 30, 0.08);
+  padding: 10px 18px 24px;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  background: rgba(255, 255, 255, 0.96);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  z-index: 60;
+  box-sizing: border-box;
+  box-shadow: 0 -8px 30px rgba(20, 28, 40, 0.06);
 }
 
 .tab-item {
@@ -792,56 +805,42 @@ const switchTab = (url) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
 }
 
 .tab-item-active {
-  color: #1c47d6;
+  color: #1847d7;
 }
 
 .tab-icon-box {
-  width: 34px;
-  height: 28px;
-  border-radius: 10px;
+  width: 44px;
+  height: 36px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .tab-icon-box-active {
-  background: #dce2ff;
+  background: #dce3ff;
 }
 
 .tab-icon {
-  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 .tab-text {
-  font-size: 9px;
+  margin-top: 4px;
+  font-size: 10px;
   font-weight: 700;
-  color: #8b8f9b;
+  color: #8b92a0;
 }
 
 .tab-text-active {
-  color: #1c47d6;
+  color: #1847d7;
 }
 
 button::after {
   border: none;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(36, 80, 219, 0.32);
-  }
-
-  70% {
-    box-shadow: 0 0 0 8px rgba(36, 80, 219, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(36, 80, 219, 0);
-  }
 }
 </style>

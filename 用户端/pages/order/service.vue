@@ -64,6 +64,8 @@
 </template>
 
 <script setup>
+import LocalIcon from '@/components/LocalIcon.vue';
+
 import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 
@@ -162,6 +164,8 @@ const handleAction = (action) => {
   z-index: 20;
   height: 60px;
   padding: 0 16px;
+  padding-top: var(--status-bar-height, env(safe-area-inset-top));
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -184,9 +188,9 @@ const handleAction = (action) => {
 }
 
 .back-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .top-title {
@@ -310,9 +314,9 @@ const handleAction = (action) => {
 }
 
 .menu-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .menu-copy {
@@ -335,7 +339,8 @@ const handleAction = (action) => {
 }
 
 .menu-arrow {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #c4cad7;
 }
 

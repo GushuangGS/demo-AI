@@ -45,6 +45,8 @@
 </template>
 
 <script setup>
+import LocalIcon from '@/components/LocalIcon.vue';
+
 import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 
@@ -95,7 +97,7 @@ const pageTitle = computed(() => (mode.value === 'pickup' ? '购买地址' : '�
 const pageDesc = computed(() =>
   mode.value === 'pickup'
     ? '选择代购门店或商圈，提交后将用于骑手购买路线。'
-    : '选择您的收货地址和联系人，提交后会同步到进行中的订单。'
+    : '选择您的收货地址和联系人，提交后会同步到进行中的订单。',
 );
 
 onLoad((options) => {
@@ -145,10 +147,13 @@ const goBack = () => {
   z-index: 20;
   height: 60px;
   padding: 0 16px;
+  padding-top: var(--status-bar-height, env(safe-area-inset-top));
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: rgba(243, 244, 246, 0.94);
+  backdrop-filter: blur(24px);
 }
 
 .back-action,
@@ -166,9 +171,9 @@ const goBack = () => {
 }
 
 .back-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .top-title {
@@ -254,9 +259,9 @@ const goBack = () => {
 }
 
 .address-icon {
-  font-size: 21px;
+  width: 21px;
+  height: 21px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .address-copy {

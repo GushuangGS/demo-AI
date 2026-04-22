@@ -124,33 +124,12 @@
         </button>
       </view>
     </view>
-
-    <view class="tab-bar">
-      <view class="tab-item tab-item-active" @click="switchTab('/pages/index/index')">
-        <view class="tab-icon-box tab-icon-box-active">
-          <LocalIcon class="tab-icon" name="calendar_month" />
-        </view>
-        <text class="tab-text tab-text-active">预约</text>
-      </view>
-
-      <view class="tab-item" @click="switchTab('/pages/order/order')">
-        <view class="tab-icon-box">
-          <LocalIcon class="tab-icon" name="receipt_long" />
-        </view>
-        <text class="tab-text">订单</text>
-      </view>
-
-      <view class="tab-item" @click="switchTab('/pages/mine/mine')">
-        <view class="tab-icon-box">
-          <LocalIcon class="tab-icon" name="person" />
-        </view>
-        <text class="tab-text">我的</text>
-      </view>
-    </view>
   </view>
 </template>
 
 <script setup>
+import LocalIcon from '@/components/LocalIcon.vue';
+
 import { computed, reactive } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { buildCommonOrderRecord, submitOrderRecord } from '../../utils/order-store';
@@ -337,7 +316,7 @@ const submitOrder = () => {
   });
 
   submitOrderRecord(orderRecord);
-  uni.switchTab({
+  uni.reLaunch({
     url: '/pages/order/order',
   });
 };
@@ -351,7 +330,7 @@ const goBack = () => {
 };
 
 const switchTab = (url) => {
-  uni.switchTab({ url });
+  uni.reLaunch({ url });
 };
 </script>
 
@@ -376,10 +355,13 @@ const switchTab = (url) => {
   z-index: 30;
   height: 66px;
   padding: 0 14px;
+  padding-top: var(--status-bar-height, env(safe-area-inset-top));
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: rgba(242, 243, 245, 0.92);
+  backdrop-filter: blur(24px);
 }
 
 .top-back {
@@ -391,9 +373,9 @@ const switchTab = (url) => {
 }
 
 .top-back-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1747d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .top-title {
@@ -457,9 +439,9 @@ const switchTab = (url) => {
   position: absolute;
   right: 18px;
   bottom: -6px;
-  font-size: 122px;
-  color: rgba(110, 146, 255, 0.42);
-  font-variation-settings: 'FILL' 1;
+  width: 122px;
+  height: 122px;
+  opacity: 0.42;
 }
 
 .panel {
@@ -476,9 +458,9 @@ const switchTab = (url) => {
 }
 
 .panel-head-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .panel-head-title {
@@ -561,9 +543,9 @@ const switchTab = (url) => {
 }
 
 .upload-icon {
-  font-size: 18px;
+  width: 18px;
+  height: 18px;
   color: #505767;
-  font-variation-settings: 'FILL' 1;
 }
 
 .upload-text {
@@ -626,7 +608,8 @@ const switchTab = (url) => {
 
 .address-arrow,
 .selector-arrow {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #7f8695;
 }
 
@@ -657,9 +640,9 @@ const switchTab = (url) => {
 }
 
 .selector-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .selector-copy {
@@ -764,9 +747,9 @@ const switchTab = (url) => {
 }
 
 .submit-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #ffffff;
-  font-variation-settings: 'FILL' 1;
 }
 
 .tab-bar {
@@ -813,9 +796,9 @@ const switchTab = (url) => {
 }
 
 .tab-icon {
-  font-size: 22px;
+  width: 22px;
+  height: 22px;
   color: #9ca5b7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .tab-text {

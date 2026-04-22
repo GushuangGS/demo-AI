@@ -1,310 +1,204 @@
 <template>
   <view class="page">
     <view class="page-shell">
-      <view class="top-bar">
-        <view class="top-brand">
-          <LocalIcon class="top-icon" name="menu" />
-          <text class="brand-name">UrbanArchitect</text>
-        </view>
-        <image class="top-avatar" :src="userAvatar" mode="aspectFill" />
-      </view>
-
-      <view class="content">
-        <view class="page-head">
-          <view>
-            <text class="page-title">订单中心</text>
-            <text class="page-subtitle">覆盖待接单、配送中和历史订单的统一操作入口</text>
+      <view v-if="pageMode === 'delivery'" class="delivery-shell">
+        <view class="delivery-top-bar">
+          <view class="delivery-back" @tap="backToList">
+            <LocalIcon class="delivery-back-icon" name="arrow_back" />
           </view>
-          <view class="summary-pill">
-            <text class="summary-dot"></text>
-            <text class="summary-text">{{ currentPrimaryLabel }}</text>
+          <text class="delivery-top-title">进行中订单</text>
+          <view class="delivery-top-actions">
+            <view class="delivery-action" @tap="shareOrder">
+              <LocalIcon class="delivery-action-icon" name="share" />
+            </view>
+            <image class="delivery-action-avatar" :src="activeOrder.rider.avatar" mode="aspectFill" />
           </view>
         </view>
 
-        <view class="primary-tabs">
-          <view
-            v-for="tab in primaryTabs"
-            :key="tab.key"
-            class="primary-tab"
-            :class="{ 'primary-tab-active': activePrimaryTab === tab.key }"
-            @click="activePrimaryTab = tab.key"
-          >
-            <LocalIcon
-              class="primary-tab-icon"
-              :class="{ 'primary-tab-icon-active': activePrimaryTab === tab.key }"
-             :name="tab.icon" />
-            <text class="primary-tab-text" :class="{ 'primary-tab-text-active': activePrimaryTab === tab.key }">
-              {{ tab.label }}
-            </text>
-          </view>
-        </view>
-
-        <view v-if="activePrimaryTab === 'pending'" class="scene scene-pending">
-          <view class="pending-hero">
-            <view class="pending-map-pattern pattern-one"></view>
-            <view class="pending-map-pattern pattern-two"></view>
-            <view class="pending-pill">
-              <text class="pending-pill-dot"></text>
-              <text class="pending-pill-text">正在寻找附近骑手</text>
-            </view>
-            <text class="pending-title">{{ pendingOrder.etaTitle }}</text>
-            <text class="pending-desc">{{ pendingOrder.etaDesc }}</text>
-          </view>
-
-          <view class="info-card pending-card">
-            <view class="order-meta-grid">
-              <view>
-                <text class="meta-label">订单编号</text>
-                <text class="meta-value meta-value-main">{{ pendingOrder.orderNo }}</text>
-              </view>
-              <view class="meta-side">
-                <text class="meta-label">预估价格</text>
-                <text class="meta-price">{{ pendingOrder.price }}</text>
-              </view>
+        <scroll-view scroll-y class="page-scroll">
+          <view class="delivery-banner">
+            <view class="delivery-eta-pill">
+              <view class="delivery-eta-dot"></view>
+              <text class="delivery-eta-text">{{ activeOrder.eta }}</text>
             </view>
 
-            <view class="address-list">
-              <view class="address-item">
-                <view class="address-icon-wrap address-icon-wrap-blue">
-                  <LocalIcon class="address-icon" name="location_on" />
-                </view>
-                <view class="address-copy">
-                  <text class="address-label">取件地址</text>
-                  <text class="address-title">{{ pendingOrder.pickupTitle }}</text>
-                  <text class="address-detail">{{ pendingOrder.pickupDetail }}</text>
+            <view class="planet-wrap">
+              <view class="planet planet-outer"></view>
+              <view class="planet planet-mid"></view>
+              <view class="planet planet-inner">
+                <view class="planet-core">
+                  <LocalIcon class="planet-icon" :name="activeOrder.listIcon" />
                 </view>
               </view>
-
-              <view class="address-line"></view>
-
-              <view class="address-item">
-                <view class="address-icon-wrap address-icon-wrap-warm">
-                  <LocalIcon class="address-icon" name="flag" />
-                </view>
-                <view class="address-copy">
-                  <text class="address-label">收件地址</text>
-                  <text class="address-title">{{ pendingOrder.receiverTitle }}</text>
-                  <text class="address-detail">{{ pendingOrder.receiverDetail }}</text>
-                </view>
-              </view>
-            </view>
-
-            <view class="action-row">
-              <button class="ghost-button" @click="showAction('修改备注')">修改备注</button>
-              <button
-                class="primary-button"
-                @click="
-                  goService({
-                    source: '待接单客服',
-                    orderNo: pendingOrder.orderNo,
-                    projectName: '同城派送服务',
-                    status: '待接单',
-                  })
-                "
-              >
-                联系客服
-              </button>
+              <view class="planet-trace"></view>
+              <view class="planet-trace planet-trace-small"></view>
+              <view class="planet-signal"></view>
             </view>
           </view>
 
-          <button class="text-button danger-text" @click="confirmCancelOrder">取消订单</button>
-        </view>
+          <view class="delivery-content">
+            <view class="rider-card">
+              <view class="rider-head">
+                <image class="rider-avatar" :src="activeOrder.rider.avatar" mode="aspectFill" />
+                <view class="rider-copy">
+                  <text class="rider-name">{{ activeOrder.rider.name }}</text>
+                  <view class="rider-meta">
+                    <LocalIcon class="rider-star" name="star" />
+                    <text class="rider-score">{{ activeOrder.rider.rating }}</text>
+                    <text class="rider-count">已配送 {{ activeOrder.rider.completed }}</text>
+                  </view>
+                </view>
 
-        <view v-else-if="activePrimaryTab === 'delivery'" class="scene scene-delivery">
-          <view class="delivery-hero">
-            <view class="delivery-pill">
-              <text class="delivery-pill-dot"></text>
-              <text class="delivery-pill-text">{{ activeOrder.eta }}</text>
-            </view>
-            <view class="globe-wrap">
-              <view class="globe globe-outer"></view>
-              <view class="globe globe-middle"></view>
-              <view class="globe globe-inner">
-                <LocalIcon class="globe-icon" name="local_shipping" />
-              </view>
-              <view class="globe-point globe-point-one"></view>
-              <view class="globe-point globe-point-two"></view>
-              <view class="globe-point globe-point-three"></view>
-            </view>
-          </view>
-
-          <view class="info-card courier-card">
-            <view class="courier-top">
-              <view class="courier-profile">
-                <image class="courier-avatar" :src="activeOrder.rider.avatar" mode="aspectFill" />
-                <view class="courier-copy">
-                  <text class="courier-name">{{ activeOrder.rider.name }}</text>
-                  <view class="courier-meta-line">
-                    <LocalIcon class="courier-star" name="star" />
-                    <text class="courier-meta">{{ activeOrder.rider.rating }}</text>
-                    <text class="courier-meta">{{ activeOrder.rider.completed }}</text>
+                <view class="rider-actions">
+                  <view class="rider-action" @tap="callRider">
+                    <LocalIcon class="rider-action-icon" name="call" />
+                  </view>
+                  <view class="rider-action" @tap="goService">
+                    <LocalIcon class="rider-action-icon" name="chat" />
                   </view>
                 </view>
               </view>
-              <view class="courier-actions">
-                <view class="round-action" @click="showAction('联系骑手')">
-                  <LocalIcon class="round-action-icon" name="call" />
-                </view>
-                <view
-                  class="round-action"
-                  @click="
-                    goService({
-                      source: '配送客服',
-                      orderNo: activeOrder.orderNo,
-                      projectName: activeOrder.goods,
-                      status: '进行中',
-                    })
-                  "
-                >
-                  <LocalIcon class="round-action-icon" name="chat" />
+
+              <view class="timeline-card">
+                <view v-for="(step, index) in activeOrder.steps" :key="step.title" class="timeline-item">
+                  <view class="timeline-side">
+                    <view class="timeline-dot" :class="step.active ? 'timeline-dot-active' : ''"></view>
+                    <view v-if="index !== activeOrder.steps.length - 1" class="timeline-line"></view>
+                  </view>
+                  <view class="timeline-copy">
+                    <text class="timeline-title">{{ step.title }}</text>
+                    <text class="timeline-desc">{{ step.desc }}</text>
+                    <text class="timeline-time">{{ step.time }}</text>
+                  </view>
                 </view>
               </view>
             </view>
 
-            <view class="timeline">
-              <view v-for="(step, index) in activeOrder.steps" :key="step.title" class="timeline-item">
-                <view class="timeline-marker-wrap">
-                  <view class="timeline-marker" :class="{ 'timeline-marker-active': step.active }"></view>
-                  <view v-if="index !== activeOrder.steps.length - 1" class="timeline-line"></view>
+            <view class="info-card address-card">
+              <view class="info-icon-box">
+                <LocalIcon class="info-icon" name="location_on" />
+              </view>
+              <view class="info-copy">
+                <text class="info-label">{{ activeOrder.addressLabel }}</text>
+                <text class="info-title">{{ activeOrder.address.title }}</text>
+                <text class="info-desc">{{ activeOrder.address.detail }}</text>
+              </view>
+            </view>
+
+            <view class="detail-grid">
+              <view class="meta-card">
+                <text class="meta-label">订单号</text>
+                <text class="meta-value">{{ activeOrder.orderNo }}</text>
+              </view>
+              <view class="meta-card">
+                <text class="meta-label">支付方式</text>
+                <view class="pay-row">
+                  <LocalIcon class="pay-icon" name="verified_user" />
+                  <text class="meta-value">{{ activeOrder.payMethod }}</text>
                 </view>
-                <view class="timeline-copy">
-                  <text class="timeline-title">{{ step.title }}</text>
-                  <text class="timeline-desc">{{ step.desc }}</text>
-                  <text class="timeline-time">{{ step.time }}</text>
-                </view>
-              </view>
-            </view>
-          </view>
-
-          <view class="detail-grid">
-            <view class="detail-card detail-address-card">
-              <view class="detail-icon-box">
-                <LocalIcon class="detail-icon" name="location_on" />
-              </view>
-              <view class="detail-copy">
-                <text class="detail-label">{{ activeOrder.addressLabel || '送达地址' }}</text>
-                <text class="detail-title">{{ activeOrder.address.title }}</text>
-                <text class="detail-desc">{{ activeOrder.address.detail }}</text>
               </view>
             </view>
 
-            <view class="detail-card detail-mini-card">
-              <text class="detail-label">订单号</text>
-              <text class="detail-title">{{ activeOrder.orderNo }}</text>
-            </view>
-
-            <view class="detail-card detail-mini-card">
-              <text class="detail-label">支付方式</text>
-              <text class="detail-title">{{ activeOrder.payMethod }}</text>
-            </view>
-          </view>
-
-          <view class="goods-card">
-            <view class="goods-head">
-              <view>
-                <text class="goods-label">{{ activeOrder.detailLabel || '物品详情' }}</text>
+            <view class="goods-card">
+              <view class="goods-main">
+                <text class="goods-label">{{ activeOrder.detailLabel }}</text>
                 <text class="goods-title">{{ activeOrder.goods }}</text>
               </view>
-              <LocalIcon class="goods-icon" name="deployed_code" />
+              <LocalIcon class="goods-icon" :name="activeOrder.listIcon" />
             </view>
-            <button
-              class="service-button"
-              @click="
-                goService({
-                  source: '配送客服',
-                  orderNo: activeOrder.orderNo,
-                  projectName: activeOrder.goods,
-                  status: '进行中',
-                })
-              "
-            >
-              联系客服中心
-            </button>
+
+            <view class="service-button" @tap="goService">
+              <LocalIcon class="service-button-icon" name="support_agent" />
+              <text class="service-button-text">联系客服中心</text>
+            </view>
           </view>
+        </scroll-view>
+      </view>
+
+      <view v-else class="list-shell">
+        <view class="top-bar">
+          <view class="brand-group">
+            <LocalIcon class="brand-menu" name="menu" />
+            <text class="brand-title">UrbanArchitect</text>
+          </view>
+          <image class="brand-avatar" :src="brandAvatar" mode="aspectFill" />
         </view>
 
-        <view v-else class="scene scene-list">
-          <view class="section-head">
-            <text class="section-title">我的订单</text>
-            <text class="section-hint">支持按状态切换与快捷操作</text>
-          </view>
+        <scroll-view scroll-y class="page-scroll">
+          <view class="content">
+            <text class="page-title">我的订单</text>
 
-          <view class="filter-tabs">
-            <view
-              v-for="tab in listTabs"
-              :key="tab.key"
-              class="filter-tab"
-              :class="{ 'filter-tab-active': activeListTab === tab.key }"
-              @click="activeListTab = tab.key"
-            >
-              <text class="filter-tab-text" :class="{ 'filter-tab-text-active': activeListTab === tab.key }">
-                {{ tab.label }}
-              </text>
+            <view class="filter-bar">
+              <view
+                v-for="item in filters"
+                :key="item.key"
+                class="filter-item"
+                :class="activeFilter === item.key ? 'filter-item-active' : ''"
+                @tap="activeFilter = item.key"
+              >
+                <text class="filter-text" :class="activeFilter === item.key ? 'filter-text-active' : ''">{{ item.label }}</text>
+              </view>
             </view>
-          </view>
 
-          <view class="order-list">
-            <view v-for="item in filteredOrders" :key="item.orderNo" class="list-card">
-              <view class="list-head">
-                <view class="list-head-main">
-                  <view class="list-icon-box" :class="item.iconClass">
-                    <LocalIcon class="list-icon" :name="item.icon" />
+            <view class="order-list">
+              <view v-for="item in filteredOrders" :key="item.orderNo" class="order-card">
+                <view class="order-card-head">
+                  <view class="order-category">
+                    <view class="order-icon-box" :class="item.iconClass">
+                      <LocalIcon class="order-icon" :name="item.icon" />
+                    </view>
+                    <view class="order-category-copy">
+                      <text class="order-category-title">{{ item.category }}</text>
+                      <text class="order-category-no">订单号:{{ item.orderNo }}</text>
+                    </view>
                   </view>
-                  <view class="list-head-copy">
-                    <text class="list-category">{{ item.category }}</text>
-                    <text class="list-order-no">订单号: {{ item.orderNo }}</text>
+                  <view class="status-pill" :class="item.statusClass">{{ item.statusLabel }}</view>
+                </view>
+
+                <view class="order-divider"></view>
+
+                <view class="order-body">
+                  <image class="order-image" :src="item.image" mode="aspectFill" />
+                  <view class="order-main">
+                    <text class="order-name">{{ item.projectName }}</text>
+                    <text class="order-desc">{{ item.projectDesc }}</text>
+                    <text class="order-price">{{ item.price }}</text>
                   </view>
                 </view>
-                <text class="status-badge" :class="item.statusClass">{{ item.statusLabel }}</text>
-              </view>
 
-              <view class="list-body">
-                <image class="project-image" :src="item.image" mode="aspectFill" />
-                <view class="project-copy">
-                  <text class="project-title">{{ item.projectName }}</text>
-                  <text class="project-desc">{{ item.projectDesc }}</text>
-                  <text class="project-price">{{ item.price }}</text>
+                <view class="order-divider"></view>
+
+                <view class="order-actions">
+                  <view class="ghost-link" @tap="goDetail(item)">查看详情</view>
+                  <view
+                    class="primary-link"
+                    :class="item.actionType === 'review' ? 'primary-link-outline' : ''"
+                    @tap="handleCardAction(item)"
+                  >
+                    {{ item.actionText }}
+                  </view>
                 </view>
               </view>
-
-              <view class="list-actions">
-                <text class="list-link" @click="goDetail(item)">查看详情</text>
-                <button
-                  class="list-button"
-                  :class="{ 'list-button-outline': item.secondary }"
-                  @click="handleOrderAction(item)"
-                >
-                  {{ item.actionText }}
-                </button>
-              </view>
-            </view>
-
-            <view v-if="!filteredOrders.length" class="empty-card">
-              <LocalIcon class="empty-icon" name="inventory_2" />
-              <text class="empty-title">当前筛选下暂无订单</text>
-              <text class="empty-desc">可以切换状态查看其他订单记录</text>
             </view>
           </view>
-        </view>
+        </scroll-view>
       </view>
     </view>
 
     <view class="tab-bar">
-      <view class="tab-item" @click="switchTab('/pages/index/index')">
+      <view class="tab-item" @tap="openRootPage('/pages/index/index')">
         <view class="tab-icon-box">
           <LocalIcon class="tab-icon" name="calendar_month" />
         </view>
         <text class="tab-text">预约</text>
       </view>
-
-      <view class="tab-item tab-item-active" @click="switchTab('/pages/order/order')">
+      <view class="tab-item tab-item-active" @tap="openRootPage('/pages/order/order')">
         <view class="tab-icon-box tab-icon-box-active">
           <LocalIcon class="tab-icon" name="receipt_long" />
         </view>
         <text class="tab-text tab-text-active">订单</text>
       </view>
-
-      <view class="tab-item" @click="switchTab('/pages/mine/mine')">
+      <view class="tab-item" @tap="openRootPage('/pages/mine/mine')">
         <view class="tab-icon-box">
           <LocalIcon class="tab-icon" name="person" />
         </view>
@@ -315,49 +209,87 @@
 </template>
 
 <script setup>
+import LocalIcon from '@/components/LocalIcon.vue';
+
 import { computed, ref } from 'vue';
-import { onMounted } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
+import {
+  ACTIVE_ORDER_STORAGE_KEY,
+  ORDER_REDIRECT_KEY,
+  getOrderRepository,
+} from '../../utils/order-store';
 
-const userAvatar = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80';
-const ORDER_REDIRECT_KEY = 'urban_architect_order_redirect';
-const ACTIVE_ORDER_STORAGE_KEY = 'urban_architect_active_order';
-const ORDER_LIST_STORAGE_KEY = 'urban_architect_order_list';
+const brandAvatar =
+  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=240&q=80';
 
-const primaryTabs = [
-  { key: 'pending', label: '待接单', icon: 'hourglass_top' },
-  { key: 'delivery', label: '进行中', icon: 'local_shipping' },
-  { key: 'list', label: '我的订单', icon: 'receipt_long' },
-];
+const pageMode = ref('list');
+const activeFilter = ref('all');
 
-const listTabs = [
+const filters = [
   { key: 'all', label: '全部' },
   { key: 'inProgress', label: '进行中' },
   { key: 'review', label: '待评价' },
   { key: 'completed', label: '已完成' },
 ];
 
-const activePrimaryTab = ref('list');
-const activeListTab = ref('all');
+const defaultOrders = [
+  {
+    orderNo: 'UA-20230914-01',
+    filter: 'inProgress',
+    category: '空间规划设计',
+    projectName: '滨海别墅概念方案',
+    projectDesc: '包含平面布局、3D建模及初步材料建议',
+    price: '¥12,800.00',
+    actionText: '联系建筑师',
+    actionType: 'service',
+    statusLabel: '进行中',
+    statusClass: 'status-blue',
+    icon: 'architecture',
+    iconClass: 'icon-blue',
+    image: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    orderNo: 'UA-20230822-04',
+    filter: 'completed',
+    category: '园林景观改造',
+    projectName: '私人住宅庭院景观',
+    projectDesc: '项目已于2023年9月5日交付完成',
+    price: '¥45,000.00',
+    actionText: '评价订单',
+    actionType: 'review',
+    statusLabel: '已完成',
+    statusClass: 'status-gray',
+    icon: 'home_work',
+    iconClass: 'icon-gray',
+    image: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=320&q=80',
+  },
+  {
+    orderNo: 'UA-20230910-09',
+    filter: 'review',
+    category: '灯光氛围设计',
+    projectName: '光影交互体验设计',
+    projectDesc: '全屋智能灯光联动方案',
+    price: '¥8,500.00',
+    actionText: '立即评价',
+    actionType: 'review',
+    statusLabel: '待评价',
+    statusClass: 'status-warm',
+    icon: 'construction',
+    iconClass: 'icon-warm',
+    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=320&q=80',
+  },
+];
 
-const pendingOrder = {
-  etaTitle: '预计 3 分钟内接单',
-  etaDesc: '您的订单已通过 Urban Architect 优先派送通道',
-  orderNo: 'UA-88294102-CH',
-  price: '¥32.50',
-  pickupTitle: '静安区南京西路 1266 号',
-  pickupDetail: '恒隆广场办公楼二座',
-  receiverTitle: '徐汇区淮海中路 999 号',
-  receiverDetail: '环贸商场',
-};
+const orderList = ref([...defaultOrders]);
 
-const defaultActiveOrder = {
-  eta: '预计 12:45 送达',
+const activeOrder = ref({
   orderNo: '#UA-8829-X1',
+  eta: '预计12:45送达',
   payMethod: '微信支付',
   goods: '建筑模型耗材 x4',
   addressLabel: '送达地址',
   detailLabel: '物品详情',
+  listIcon: 'shopping_bag',
   rider: {
     name: '张大伟',
     rating: '4.9',
@@ -367,7 +299,7 @@ const defaultActiveOrder = {
   steps: [
     {
       title: '正在配送中',
-      desc: '骑手已取货，正火速赶往您的地址',
+      desc: '骑手已取货，正火速赶赴您的地址',
       time: '12:32 PM',
       active: true,
     },
@@ -382,205 +314,157 @@ const defaultActiveOrder = {
     title: '静安区南京西路 1601 号',
     detail: '越洋广场 28 楼 138****8888',
   },
-};
-
-const activeOrder = ref({ ...defaultActiveOrder });
-
-const defaultOrderList = [
-  {
-    orderNo: 'UA-20230914-01',
-    filter: 'inProgress',
-    category: '空间规划设计',
-    projectName: '滨海别墅概念方案',
-    projectDesc: '包含平面布局、3D 建模及初步材料建议',
-    price: '¥12,800.00',
-    actionText: '联系建筑师',
-    actionType: 'service',
-    statusLabel: '进行中',
-    statusClass: 'status-blue',
-    icon: 'architecture',
-    iconClass: 'icon-blue',
-    secondary: false,
-    image: 'https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=320&q=80',
-  },
-  {
-    orderNo: 'UA-20230822-04',
-    filter: 'completed',
-    category: '园林景观改造',
-    projectName: '私人住宅庭院景观',
-    projectDesc: '项目已于 2023 年 9 月 5 日交付，可回看完整方案',
-    price: '¥45,000.00',
-    actionText: '评价订单',
-    actionType: 'review',
-    statusLabel: '已完成',
-    statusClass: 'status-gray',
-    icon: 'home_work',
-    iconClass: 'icon-gray',
-    secondary: true,
-    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=320&q=80',
-  },
-  {
-    orderNo: 'UA-20230910-09',
-    filter: 'review',
-    category: '灯光氛围设计',
-    projectName: '光影交互体验设计',
-    projectDesc: '全屋智能灯光联动方案，待您确认最终服务评价',
-    price: '¥8,500.00',
-    actionText: '立即评价',
-    actionType: 'review',
-    statusLabel: '待评价',
-    statusClass: 'status-warm',
-    icon: 'construction',
-    iconClass: 'icon-warm',
-    secondary: false,
-    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=320&q=80',
-  },
-];
-
-const currentPrimaryLabel = computed(() => {
-  const current = primaryTabs.find((tab) => tab.key === activePrimaryTab.value);
-  return current ? current.label : '订单';
 });
-
-const customOrderList = ref([]);
-
-const displayOrderList = computed(() => [...customOrderList.value, ...defaultOrderList]);
 
 const filteredOrders = computed(() => {
-  if (activeListTab.value === 'all') {
-    return displayOrderList.value;
+  if (activeFilter.value === 'all') {
+    return orderList.value;
   }
-  return displayOrderList.value.filter((item) => item.filter === activeListTab.value);
+  return orderList.value.filter((item) => item.filter === activeFilter.value);
 });
 
-const showAction = (action) => {
-  uni.showToast({
-    title: `${action}功能待接入`,
-    icon: 'none',
-  });
+const normalizeActiveOrder = (payload) => {
+  if (!payload || typeof payload !== 'object') {
+    return;
+  }
+
+  activeOrder.value = {
+    orderNo: payload.orderNo || activeOrder.value.orderNo,
+    eta: payload.eta || activeOrder.value.eta,
+    payMethod: payload.payMethod || activeOrder.value.payMethod,
+    goods: payload.goods || activeOrder.value.goods,
+    addressLabel: payload.addressLabel || '送达地址',
+    detailLabel: payload.detailLabel || '物品详情',
+    listIcon: guessListIcon(payload.goods),
+    rider: {
+      name: payload.rider?.name || activeOrder.value.rider.name,
+      rating: payload.rider?.rating || activeOrder.value.rider.rating,
+      completed: payload.rider?.completed || activeOrder.value.rider.completed,
+      avatar: payload.rider?.avatar || activeOrder.value.rider.avatar,
+    },
+    steps: Array.isArray(payload.steps) && payload.steps.length ? payload.steps : activeOrder.value.steps,
+    address: {
+      title: payload.address?.title || activeOrder.value.address.title,
+      detail: payload.address?.detail || activeOrder.value.address.detail,
+    },
+  };
 };
 
-const buildQuery = (params) =>
-  Object.entries(params)
-    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-    .join('&');
+const guessListIcon = (goods) => {
+  const text = String(goods || '');
+  if (text.includes('送') || text.includes('快递')) {
+    return 'local_shipping';
+  }
+  if (text.includes('办') || text.includes('挂号')) {
+    return 'assignment';
+  }
+  if (text.includes('万能') || text.includes('需求')) {
+    return 'auto_awesome';
+  }
+  return 'shopping_bag';
+};
 
-const goService = ({ source, orderNo, projectName, status }) => {
-  uni.navigateTo({
-    url: `/pages/order/service?${buildQuery({
-      source,
-      orderNo,
-      projectName,
-      status,
-    })}`,
+const syncOrderList = () => {
+  const repository = getOrderRepository();
+  const dynamicList = repository
+    .map((item) => item.listItem)
+    .filter(Boolean)
+    .map((item) => ({
+      ...item,
+      icon: item.icon || 'shopping_bag',
+      iconClass: item.iconClass || 'icon-blue',
+      statusClass: item.statusClass || 'status-blue',
+      image: item.image || defaultOrders[0].image,
+    }));
+
+  const merged = [...dynamicList];
+  defaultOrders.forEach((item) => {
+    if (!merged.some((current) => current.orderNo === item.orderNo)) {
+      merged.push(item);
+    }
   });
+  orderList.value = merged;
+};
+
+const syncActiveMode = () => {
+  const redirect = uni.getStorageSync(ORDER_REDIRECT_KEY);
+  const cachedOrder = uni.getStorageSync(ACTIVE_ORDER_STORAGE_KEY);
+  normalizeActiveOrder(cachedOrder);
+
+  if (redirect === 'delivery') {
+    pageMode.value = 'delivery';
+    uni.removeStorageSync(ORDER_REDIRECT_KEY);
+    return;
+  }
+
+  pageMode.value = 'list';
+};
+
+onShow(() => {
+  syncOrderList();
+  syncActiveMode();
+});
+
+const openRootPage = (url) => {
+  uni.reLaunch({ url });
+};
+
+const backToList = () => {
+  pageMode.value = 'list';
 };
 
 const goDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/order/detail?${buildQuery({
-      orderNo: item.orderNo,
-      projectName: item.projectName,
-      status: item.statusLabel,
-      price: item.price,
-    })}`,
+    url: `/pages/order/detail?orderNo=${encodeURIComponent(item.orderNo)}&projectName=${encodeURIComponent(
+      item.projectName,
+    )}&status=${encodeURIComponent(item.statusLabel)}&price=${encodeURIComponent(item.price)}`,
   });
 };
 
-const goReview = (item) => {
-  uni.navigateTo({
-    url: `/pages/order/review?${buildQuery({
-      orderNo: item.orderNo,
-      projectName: item.projectName,
-      status: item.statusLabel,
-      price: item.price,
-    })}`,
-  });
-};
-
-const handleOrderAction = (item) => {
-  if (item.actionType === 'service') {
-    goService({
-      source: item.actionText,
-      orderNo: item.orderNo,
-      projectName: item.projectName,
-      status: item.statusLabel,
+const handleCardAction = (item) => {
+  if (item.actionType === 'review') {
+    uni.navigateTo({
+      url: `/pages/order/review?orderNo=${encodeURIComponent(item.orderNo)}&projectName=${encodeURIComponent(
+        item.projectName,
+      )}&status=${encodeURIComponent(item.statusLabel)}&price=${encodeURIComponent(item.price)}`,
     });
     return;
   }
 
-  if (item.actionType === 'review') {
-    goReview(item);
-    return;
-  }
-
-  showAction(item.actionText);
-};
-
-const syncActiveOrderFromStorage = () => {
-  const cachedScene = uni.getStorageSync(ORDER_REDIRECT_KEY);
-  const cachedOrder = uni.getStorageSync(ACTIVE_ORDER_STORAGE_KEY);
-  const cachedOrderList = uni.getStorageSync(ORDER_LIST_STORAGE_KEY);
-
-  customOrderList.value = Array.isArray(cachedOrderList) ? cachedOrderList : [];
-
-  if (cachedOrder && typeof cachedOrder === 'object' && cachedOrder.orderNo) {
-    activeOrder.value = {
-      ...defaultActiveOrder,
-      ...cachedOrder,
-      rider: {
-        ...defaultActiveOrder.rider,
-        ...(cachedOrder.rider || {}),
-      },
-      address: {
-        ...defaultActiveOrder.address,
-        ...(cachedOrder.address || {}),
-      },
-      steps: cachedOrder.steps || defaultActiveOrder.steps,
-    };
-  }
-
-  if (cachedScene === 'delivery') {
-    activePrimaryTab.value = 'delivery';
-    activeListTab.value = 'inProgress';
-    uni.removeStorageSync(ORDER_REDIRECT_KEY);
-  }
-};
-
-const confirmCancelOrder = () => {
-  uni.showModal({
-    title: '确认取消订单',
-    content: '订单仍在派单中，确认现在取消吗？',
-    confirmColor: '#1647d8',
-    success: (res) => {
-      if (res.confirm) {
-        uni.showToast({
-          title: '订单已取消',
-          icon: 'none',
-        });
-      }
-    },
+  uni.navigateTo({
+    url: `/pages/order/service?source=${encodeURIComponent('订单列表')}&orderNo=${encodeURIComponent(
+      item.orderNo,
+    )}&projectName=${encodeURIComponent(item.projectName)}&status=${encodeURIComponent(item.statusLabel)}`,
   });
 };
 
-onMounted(() => {
-  uni.hideTabBar();
-  syncActiveOrderFromStorage();
-});
+const goService = () => {
+  uni.navigateTo({
+    url: `/pages/order/service?source=${encodeURIComponent('进行中订单')}&orderNo=${encodeURIComponent(
+      activeOrder.value.orderNo,
+    )}&projectName=${encodeURIComponent(activeOrder.value.goods)}&status=${encodeURIComponent('进行中')}`,
+  });
+};
 
-onShow(() => {
-  syncActiveOrderFromStorage();
-});
+const shareOrder = () => {
+  uni.showToast({
+    title: '分享功能待接入',
+    icon: 'none',
+  });
+};
 
-const switchTab = (url) => {
-  uni.switchTab({ url });
+const callRider = () => {
+  uni.showToast({
+    title: '骑手通话待接入',
+    icon: 'none',
+  });
 };
 </script>
 
 <style scoped>
 .page {
   min-height: 100vh;
-  background: #f3f4f6;
+  background: #f2f3f5;
   color: #191c1e;
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
@@ -588,817 +472,141 @@ const switchTab = (url) => {
 .page-shell {
   width: 100%;
   max-width: 430px;
-  min-height: 100vh;
   margin: 0 auto;
+  min-height: 100vh;
+  padding-bottom: 112px;
+  box-sizing: border-box;
 }
 
-.top-bar {
+.page-scroll {
+  height: 100vh;
+}
+
+.top-bar,
+.delivery-top-bar {
   position: sticky;
   top: 0;
   z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px 12px;
-  background: rgba(243, 244, 246, 0.92);
-  backdrop-filter: blur(24px);
+  box-sizing: border-box;
 }
 
-.top-brand {
+.top-bar {
+  padding-top: var(--status-bar-height, env(safe-area-inset-top));
+  box-sizing: content-box;
+  height: 74px;
+  padding: 18px 18px 12px;
+  background: rgba(242, 243, 245, 0.96);
+}
+
+.brand-group {
   display: flex;
   align-items: center;
-  gap: 10px;
 }
 
-.top-icon {
-  font-size: 22px;
-  color: #1246cf;
-  font-variation-settings: 'FILL' 1;
+.brand-menu {
+  width: 22px;
+  height: 22px;
 }
 
-.brand-name {
-  font-size: 15px;
+.brand-title {
+  margin-left: 14px;
+  font-size: 20px;
   font-weight: 800;
-  color: #1246cf;
-  letter-spacing: -0.03em;
+  color: #1847d7;
 }
 
-.top-avatar {
-  width: 34px;
-  height: 34px;
+.brand-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
-  box-shadow: 0 8px 20px rgba(25, 28, 30, 0.08);
 }
 
 .content {
-  padding: 6px 16px calc(130px + env(safe-area-inset-bottom));
-}
-
-.page-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  padding: 10px 18px 24px;
 }
 
 .page-title {
   display: block;
-  font-size: 28px;
-  line-height: 1.15;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  color: #181b20;
-}
-
-.page-subtitle {
-  display: block;
-  margin-top: 8px;
-  max-width: 240px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: #697080;
-}
-
-.summary-pill {
-  flex-shrink: 0;
-  margin-top: 6px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: #e2e8ff;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.summary-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #1847d7;
-}
-
-.summary-text {
-  font-size: 10px;
-  font-weight: 800;
-  color: #1847d7;
-}
-
-.primary-tabs {
-  margin-top: 22px;
-  padding: 6px;
-  border-radius: 24px;
-  background: #eceef2;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.primary-tab {
-  min-height: 76px;
-  border-radius: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.primary-tab-active {
-  background: #ffffff;
-  box-shadow: 0 8px 22px rgba(17, 24, 39, 0.06);
-}
-
-.primary-tab-icon {
-  font-size: 22px;
-  color: #99a1af;
-  font-variation-settings: 'FILL' 1;
-}
-
-.primary-tab-icon-active,
-.primary-tab-text-active {
-  color: #1647d8;
-}
-
-.primary-tab-text {
-  font-size: 12px;
-  font-weight: 700;
-  color: #5d6372;
-}
-
-.scene {
-  margin-top: 20px;
-}
-
-.pending-hero {
-  position: relative;
-  overflow: hidden;
-  border-radius: 32px 32px 22px 22px;
-  min-height: 260px;
-  padding: 22px 20px 26px;
-  background: linear-gradient(180deg, #d7dae2 0%, #c6cad5 100%);
-}
-
-.pending-map-pattern {
-  position: absolute;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.34);
-}
-
-.pattern-one {
-  width: 420px;
-  height: 420px;
-  left: -120px;
-  top: -36px;
-}
-
-.pattern-two {
-  width: 300px;
-  height: 300px;
-  right: -88px;
-  top: 54px;
-}
-
-.pending-pill {
-  position: relative;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 16px;
-  background: rgba(235, 239, 255, 0.94);
-}
-
-.pending-pill-dot,
-.delivery-pill-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #244fd7;
-}
-
-.pending-pill-text,
-.delivery-pill-text {
-  font-size: 12px;
-  font-weight: 800;
-  color: #173ebc;
-}
-
-.pending-title {
-  position: relative;
-  z-index: 2;
-  display: block;
-  margin-top: 46px;
-  font-size: 30px;
-  line-height: 1.15;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  color: #111418;
-}
-
-.pending-desc {
-  position: relative;
-  z-index: 2;
-  display: block;
-  margin-top: 14px;
-  max-width: 280px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #4d5361;
-}
-
-.info-card {
-  margin-top: -28px;
-  position: relative;
-  z-index: 3;
-  border-radius: 30px;
-  background: #fbfbfc;
-  box-shadow: 0 18px 40px rgba(34, 40, 52, 0.08);
-}
-
-.pending-card {
-  padding: 24px;
-}
-
-.order-meta-grid {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.meta-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 800;
-  color: #1a48d0;
-}
-
-.meta-value,
-.meta-price {
-  display: block;
-  margin-top: 12px;
-  color: #1a1d24;
-}
-
-.meta-value-main {
-  font-size: 30px;
-  line-height: 1.1;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-}
-
-.meta-side {
-  text-align: right;
-}
-
-.meta-price {
-  font-size: 34px;
-  line-height: 1;
-  font-weight: 800;
-  letter-spacing: -0.06em;
-}
-
-.address-list {
-  margin-top: 26px;
-}
-
-.address-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
-
-.address-line {
-  width: 2px;
-  height: 34px;
-  margin: 10px 0 10px 16px;
-  background: #dbdfe8;
-}
-
-.address-icon-wrap {
-  width: 34px;
-  height: 34px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.address-icon-wrap-blue {
-  background: #dfe5ff;
-}
-
-.address-icon-wrap-warm {
-  background: #f7d9cc;
-}
-
-.address-icon {
-  font-size: 18px;
-  font-variation-settings: 'FILL' 1;
-}
-
-.address-icon-wrap-blue .address-icon {
-  color: #1847d7;
-}
-
-.address-icon-wrap-warm .address-icon {
-  color: #9f3006;
-}
-
-.address-copy {
-  flex: 1;
-  min-width: 0;
-}
-
-.address-label {
-  display: block;
-  font-size: 12px;
-  color: #7d8392;
-}
-
-.address-title {
-  display: block;
-  margin-top: 6px;
-  font-size: 18px;
-  line-height: 1.35;
-  font-weight: 800;
-  color: #1b1e25;
-}
-
-.address-detail {
-  display: block;
-  margin-top: 6px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #525968;
-}
-
-.action-row {
-  margin-top: 28px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.ghost-button,
-.primary-button,
-.list-button,
-.service-button {
-  height: 56px;
-  border: none;
-  border-radius: 18px;
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 56px;
-}
-
-.ghost-button {
-  background: #eaedf2;
-  color: #444b5b;
-}
-
-.primary-button,
-.service-button,
-.list-button:not(.list-button-outline) {
-  background: linear-gradient(180deg, #1747d7 0%, #0d3cc7 100%);
-  color: #ffffff;
-  box-shadow: 0 14px 24px rgba(19, 67, 201, 0.22);
-}
-
-.text-button {
-  margin-top: 20px;
-  width: 100%;
-  background: transparent;
-  border: none;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.danger-text {
-  color: #8b93a7;
-}
-
-.delivery-hero {
-  overflow: hidden;
-  border-radius: 28px;
-  min-height: 360px;
-  padding: 18px 18px 0;
-  background: linear-gradient(180deg, #39a7d5 0%, #237ca6 100%);
-}
-
-.delivery-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
-}
-
-.globe-wrap {
-  position: relative;
-  width: 220px;
-  height: 250px;
-  margin: 24px auto 0;
-}
-
-.globe {
-  position: absolute;
-  left: 50%;
-  border-radius: 50%;
-  transform: translateX(-50%);
-}
-
-.globe-outer {
-  top: 0;
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle at 40% 35%, #e5f9f7 0%, #bfe6ea 50%, #8bc8d7 100%);
-}
-
-.globe-middle {
-  top: 44px;
-  width: 138px;
-  height: 138px;
-  background: radial-gradient(circle at 45% 35%, #f7f7fb 0%, #cfd8ed 60%, #b8c7e8 100%);
-}
-
-.globe-inner {
-  top: 82px;
-  width: 74px;
-  height: 74px;
-  background: linear-gradient(180deg, #1a48d7 0%, #103dc3 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 14px 28px rgba(16, 61, 195, 0.28);
-}
-
-.globe-icon {
-  font-size: 30px;
-  color: #ffffff;
-  font-variation-settings: 'FILL' 1;
-}
-
-.globe-point {
-  position: absolute;
-  left: 50%;
-  border-radius: 50%;
-  transform: translateX(-50%);
-}
-
-.globe-point-one {
-  bottom: 42px;
-  width: 12px;
-  height: 12px;
-  background: rgba(203, 231, 255, 0.72);
-}
-
-.globe-point-two {
-  bottom: 16px;
-  width: 20px;
-  height: 20px;
-  background: #f7c53f;
-}
-
-.globe-point-three {
-  bottom: -2px;
-  width: 10px;
-  height: 10px;
-  background: rgba(203, 231, 255, 0.48);
-}
-
-.courier-card {
-  margin-top: -18px;
-  padding: 22px 18px;
-}
-
-.courier-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.courier-profile {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
-.courier-avatar {
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
-}
-
-.courier-copy {
-  margin-left: 12px;
-  min-width: 0;
-}
-
-.courier-name {
-  display: block;
-  font-size: 18px;
-  font-weight: 800;
-  color: #171a20;
-}
-
-.courier-meta-line {
-  margin-top: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.courier-star {
-  font-size: 15px;
-  color: #1948d7;
-  font-variation-settings: 'FILL' 1;
-}
-
-.courier-meta {
-  font-size: 12px;
-  color: #6b7282;
-}
-
-.courier-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.round-action {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #dde3fb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.round-action-icon {
-  font-size: 22px;
-  color: #1a48d7;
-  font-variation-settings: 'FILL' 1;
-}
-
-.timeline {
-  margin-top: 24px;
-}
-
-.timeline-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
-
-.timeline-item + .timeline-item {
-  margin-top: 14px;
-}
-
-.timeline-marker-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.timeline-marker {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #cfd5ef;
-}
-
-.timeline-marker-active {
-  background: #1948d7;
-  box-shadow: 0 0 0 4px rgba(25, 72, 215, 0.12);
-}
-
-.timeline-line {
-  width: 2px;
-  height: 44px;
-  margin-top: 6px;
-  background: #d8dded;
-}
-
-.timeline-copy {
-  padding-top: 1px;
-}
-
-.timeline-title {
-  display: block;
-  font-size: 16px;
-  font-weight: 800;
-  color: #20242b;
-}
-
-.timeline-desc {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: #6c7383;
-}
-
-.timeline-time {
-  display: block;
-  margin-top: 6px;
-  font-size: 11px;
-  color: #9aa1b0;
-}
-
-.detail-grid {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.detail-card {
-  border-radius: 24px;
-  background: #f0f2f6;
-}
-
-.detail-address-card {
-  grid-column: span 2;
-  padding: 18px;
-  display: flex;
-  gap: 14px;
-}
-
-.detail-icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  background: #dce4ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.detail-icon {
   font-size: 24px;
-  color: #1847d7;
-  font-variation-settings: 'FILL' 1;
-}
-
-.detail-copy {
-  flex: 1;
-}
-
-.detail-label,
-.goods-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  color: #667085;
-}
-
-.detail-title,
-.goods-title {
-  display: block;
-  margin-top: 8px;
-  font-size: 18px;
-  line-height: 1.35;
   font-weight: 800;
-  color: #171a21;
+  color: #161b22;
 }
 
-.detail-desc {
-  display: block;
-  margin-top: 6px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: #555d6d;
-}
-
-.detail-mini-card {
-  padding: 18px 16px;
-}
-
-.goods-card {
-  margin-top: 14px;
-  overflow: hidden;
-  border-radius: 24px;
-  background: linear-gradient(180deg, #2751d7 0%, #113fbf 100%);
-}
-
-.goods-head {
-  padding: 18px 18px 14px;
+.filter-bar {
+  margin-top: 22px;
+  height: 48px;
+  border-radius: 18px;
+  background: #eceef2;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  padding: 4px;
+  box-sizing: border-box;
 }
 
-.goods-label,
-.goods-title,
-.goods-icon,
-.service-button {
-  color: #ffffff;
-}
-
-.goods-label {
-  color: rgba(235, 240, 255, 0.8);
-}
-
-.goods-icon {
-  font-size: 30px;
-  font-variation-settings: 'FILL' 1;
-}
-
-.service-button {
-  margin: 0;
-  border-radius: 0;
-  background: #0f37b1;
-  box-shadow: none;
-}
-
-.section-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.section-title {
-  font-size: 16px;
-  font-weight: 800;
-  color: #191c21;
-}
-
-.section-hint {
-  font-size: 12px;
-  color: #7b8291;
-}
-
-.filter-tabs {
-  margin-top: 18px;
-  padding: 6px;
-  border-radius: 20px;
-  background: #eceef2;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.filter-tab {
-  min-height: 42px;
+.filter-item {
+  flex: 1;
+  height: 40px;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.filter-tab-active {
+.filter-item-active {
   background: #ffffff;
-  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.05);
 }
 
-.filter-tab-text {
-  font-size: 13px;
-  font-weight: 700;
-  color: #666d7d;
+.filter-text {
+  font-size: 14px;
+  color: #606876;
 }
 
-.filter-tab-text-active {
+.filter-text-active {
   color: #1847d7;
+  font-weight: 800;
 }
 
 .order-list {
   margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
-.list-card {
+.order-card {
+  margin-bottom: 18px;
   border-radius: 28px;
   background: #f8f8f9;
   padding: 18px;
-  box-shadow: 0 10px 28px rgba(20, 26, 38, 0.04);
+  box-sizing: border-box;
+  box-shadow: 0 14px 28px rgba(20, 28, 40, 0.04);
 }
 
-.list-head {
+.order-card-head,
+.order-category,
+.order-body,
+.order-actions,
+.pay-row,
+.delivery-top-actions,
+.rider-head,
+.rider-meta,
+.rider-actions,
+.info-card,
+.goods-card,
+.service-button,
+.delivery-eta-pill {
   display: flex;
   align-items: center;
+}
+
+.order-card-head,
+.order-actions {
   justify-content: space-between;
-  gap: 12px;
 }
 
-.list-head-main {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
-.list-icon-box {
-  width: 42px;
-  height: 42px;
+.order-icon-box {
+  width: 38px;
+  height: 38px;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -1406,189 +614,603 @@ const switchTab = (url) => {
 }
 
 .icon-blue {
-  background: #dfe3ff;
+  background: #dde3ff;
 }
 
 .icon-gray {
-  background: #ebeef3;
+  background: #eceef2;
 }
 
 .icon-warm {
-  background: #f7ddd2;
+  background: #ffe4da;
 }
 
-.list-icon {
-  font-size: 20px;
-  font-variation-settings: 'FILL' 1;
+.order-icon {
+  width: 18px;
+  height: 18px;
 }
 
-.icon-blue .list-icon {
-  color: #1847d7;
-}
-
-.icon-gray .list-icon {
-  color: #5e6472;
-}
-
-.icon-warm .list-icon {
-  color: #9b320f;
-}
-
-.list-head-copy {
+.order-category-copy {
   margin-left: 12px;
-  min-width: 0;
 }
 
-.list-category {
+.order-category-title {
   display: block;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   color: #1847d7;
 }
 
-.list-order-no {
+.order-category-no {
   display: block;
   margin-top: 4px;
   font-size: 12px;
-  color: #8a91a0;
+  color: #9097a3;
 }
 
-.status-badge {
-  flex-shrink: 0;
-  padding: 6px 10px;
+.status-pill {
+  min-width: 66px;
+  padding: 0 12px;
+  height: 28px;
   border-radius: 999px;
+  text-align: center;
+  line-height: 28px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
+  box-sizing: border-box;
 }
 
 .status-blue {
-  background: #dfe5ff;
+  background: #dde3ff;
   color: #1847d7;
 }
 
 .status-gray {
-  background: #e7e9ef;
-  color: #737b89;
+  background: #eceef2;
+  color: #767d89;
 }
 
 .status-warm {
-  background: #f5ddd2;
-  color: #9a330f;
+  background: #ffdcd3;
+  color: #9f3514;
 }
 
-.list-body {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid #e6e8ee;
-  display: flex;
-  gap: 14px;
+.order-divider {
+  height: 1px;
+  margin: 16px 0;
+  background: rgba(196, 197, 215, 0.35);
 }
 
-.project-image {
+.order-image {
   width: 78px;
   height: 78px;
-  border-radius: 18px;
-  flex-shrink: 0;
+  border-radius: 14px;
 }
 
-.project-copy {
+.order-main {
   flex: 1;
-  min-width: 0;
+  margin-left: 14px;
 }
 
-.project-title {
+.order-name {
   display: block;
-  font-size: 20px;
-  line-height: 1.25;
+  font-size: 18px;
+  line-height: 1.4;
   font-weight: 800;
-  color: #1a1d23;
+  color: #191d24;
 }
 
-.project-desc {
+.order-desc {
   display: block;
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 13px;
-  line-height: 1.55;
-  color: #666e7d;
+  line-height: 1.6;
+  color: #666f7e;
 }
 
-.project-price {
+.order-price {
   display: block;
   margin-top: 10px;
   font-size: 20px;
-  line-height: 1.15;
   font-weight: 800;
-  color: #191c22;
+  color: #1a1f27;
 }
 
-.list-actions {
-  margin-top: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.list-link {
+.ghost-link,
+.primary-link {
+  min-width: 112px;
+  height: 42px;
+  border-radius: 14px;
+  text-align: center;
+  line-height: 42px;
   font-size: 14px;
-  font-weight: 700;
-  color: #1948d7;
+  font-weight: 800;
+  box-sizing: border-box;
 }
 
-.list-button {
-  min-width: 124px;
-  padding: 0 18px;
+.ghost-link {
+  color: #1847d7;
 }
 
-.list-button-outline {
+.primary-link {
+  background: linear-gradient(180deg, #1e4ad8 0%, #103ed2 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 22px rgba(24, 71, 215, 0.2);
+}
+
+.primary-link-outline {
   background: transparent;
-  color: #1747d7;
-  border: 1px solid #1747d7;
+  border: 1px solid #1847d7;
+  color: #1847d7;
   box-shadow: none;
 }
 
-.empty-card {
-  border-radius: 24px;
-  background: #f8f8f9;
-  padding: 30px 18px;
-  text-align: center;
+.delivery-top-bar {
+  height: 62px;
+  padding: 0 16px;
+  background: #f2f3f5;
 }
 
-.empty-icon {
-  font-size: 36px;
-  color: #b0b7c6;
+.delivery-back,
+.delivery-action {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.empty-title {
-  display: block;
-  margin-top: 12px;
-  font-size: 16px;
+.delivery-back-icon,
+.delivery-action-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.delivery-top-title {
+  font-size: 18px;
   font-weight: 800;
-  color: #2c3138;
+  color: #1847d7;
 }
 
-.empty-desc {
+.delivery-action-avatar {
+  width: 28px;
+  height: 28px;
+  margin-left: 10px;
+  border-radius: 50%;
+}
+
+.delivery-banner {
+  position: relative;
+  overflow: hidden;
+  min-height: 350px;
+  background: linear-gradient(180deg, #3aa3d0 0%, #247caa 58%, #1870a1 100%);
+}
+
+.delivery-banner::before,
+.delivery-banner::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+}
+
+.delivery-banner::before {
+  width: 520px;
+  height: 520px;
+  left: -80px;
+  top: -170px;
+}
+
+.delivery-banner::after {
+  width: 660px;
+  height: 660px;
+  left: -160px;
+  top: -260px;
+}
+
+.delivery-eta-pill {
+  position: absolute;
+  top: 24px;
+  left: 18px;
+  z-index: 2;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  box-sizing: border-box;
+}
+
+.delivery-eta-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4779e7;
+}
+
+.delivery-eta-text {
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e4ad8;
+}
+
+.planet-wrap {
+  position: relative;
+  width: 220px;
+  height: 250px;
+  margin: 74px auto 0;
+}
+
+.planet {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+}
+
+.planet-outer {
+  top: 0;
+  width: 176px;
+  height: 176px;
+  background: rgba(212, 250, 255, 0.8);
+}
+
+.planet-mid {
+  top: 38px;
+  width: 138px;
+  height: 138px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.planet-inner {
+  top: 78px;
+  width: 92px;
+  height: 92px;
+  background: rgba(200, 215, 244, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.planet-core {
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  background: #1847d7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.planet-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.planet-trace,
+.planet-signal {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+}
+
+.planet-trace {
+  width: 10px;
+  height: 10px;
+  bottom: 26px;
+  background: rgba(212, 250, 255, 0.6);
+}
+
+.planet-trace-small {
+  width: 6px;
+  height: 6px;
+  bottom: 10px;
+}
+
+.planet-signal {
+  width: 20px;
+  height: 20px;
+  bottom: -18px;
+  background: linear-gradient(180deg, #ffd24a 0%, #f0a700 100%);
+}
+
+.delivery-content {
+  margin-top: -20px;
+  padding: 0 16px 24px;
+}
+
+.rider-card,
+.info-card,
+.meta-card {
+  background: #f8f8f9;
+}
+
+.rider-card {
+  border-radius: 28px;
+  padding: 18px;
+  box-shadow: 0 14px 28px rgba(20, 28, 40, 0.04);
+}
+
+.rider-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+}
+
+.rider-copy {
+  flex: 1;
+  margin-left: 14px;
+}
+
+.rider-name {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: #171c23;
+}
+
+.rider-meta {
+  margin-top: 8px;
+}
+
+.rider-star {
+  width: 14px;
+  height: 14px;
+}
+
+.rider-score {
+  margin-left: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #1847d7;
+}
+
+.rider-count {
+  margin-left: 10px;
+  font-size: 13px;
+  color: #737b89;
+}
+
+.rider-actions {
+  margin-left: 12px;
+}
+
+.rider-action {
+  width: 42px;
+  height: 42px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: #dde3ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rider-action-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.timeline-card {
+  margin-top: 18px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+.timeline-item + .timeline-item {
+  margin-top: 18px;
+}
+
+.timeline-side {
+  width: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #cfd6ef;
+}
+
+.timeline-dot-active {
+  background: #1847d7;
+  box-shadow: 0 0 0 4px rgba(24, 71, 215, 0.14);
+}
+
+.timeline-line {
+  width: 2px;
+  height: 44px;
+  margin-top: 6px;
+  background: #d6dcef;
+}
+
+.timeline-copy {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.timeline-title {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  color: #20242c;
+}
+
+.timeline-desc {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #707888;
+}
+
+.timeline-time {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #8b92a0;
+}
+
+.info-card {
+  margin-top: 18px;
+  border-radius: 22px;
+  padding: 16px;
+}
+
+.info-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #dde3ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.info-copy {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.info-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1847d7;
+}
+
+.info-title {
   display: block;
   margin-top: 8px;
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 800;
+  color: #1a1f27;
+}
+
+.info-desc {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #626a79;
+}
+
+.detail-grid {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.meta-card {
+  width: calc(50% - 7px);
+  border-radius: 20px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.meta-label {
+  display: block;
   font-size: 12px;
-  color: #7d8594;
+  color: #8e95a2;
+}
+
+.meta-value {
+  display: block;
+  margin-top: 10px;
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 800;
+  color: #191e26;
+}
+
+.pay-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+}
+
+.goods-card {
+  margin-top: 18px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #2b58dc 0%, #1847d7 100%);
+  padding: 18px;
+  justify-content: space-between;
+}
+
+.goods-main {
+  flex: 1;
+}
+
+.goods-label {
+  display: block;
+  font-size: 12px;
+  color: rgba(235, 239, 255, 0.82);
+}
+
+.goods-title {
+  display: block;
+  margin-top: 8px;
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.goods-icon {
+  width: 28px;
+  height: 28px;
+  margin-left: 12px;
+}
+
+.service-button {
+  margin-top: 0;
+  height: 54px;
+  border-bottom-left-radius: 22px;
+  border-bottom-right-radius: 22px;
+  background: #113fc9;
+  justify-content: center;
+}
+
+.service-button-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.service-button-text {
+  margin-left: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
 }
 
 .tab-bar {
   position: fixed;
   left: 50%;
-  bottom: calc(10px + env(safe-area-inset-bottom));
+  bottom: 0;
+  z-index: 40;
+  width: 100%;
+  max-width: 430px;
   transform: translateX(-50%);
-  width: calc(100% - 24px);
-  max-width: 406px;
-  padding: 10px 10px 12px;
-  border-radius: 24px;
-  background: rgba(247, 247, 248, 0.96);
-  box-shadow: 0 10px 32px rgba(25, 28, 30, 0.08);
+  padding: 10px 18px 24px;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  background: rgba(255, 255, 255, 0.96);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  z-index: 60;
+  box-sizing: border-box;
+  box-shadow: 0 -8px 30px rgba(20, 28, 40, 0.06);
 }
 
 .tab-item {
@@ -1596,17 +1218,15 @@ const switchTab = (url) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
 }
 
 .tab-item-active {
-  color: #1c47d6;
+  color: #1847d7;
 }
 
 .tab-icon-box {
-  width: 58px;
-  height: 44px;
+  width: 44px;
+  height: 36px;
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -1614,27 +1234,22 @@ const switchTab = (url) => {
 }
 
 .tab-icon-box-active {
-  background: #e8edf7;
+  background: #dce3ff;
 }
 
 .tab-icon {
-  font-size: 22px;
-  color: #9ca5b7;
-  font-variation-settings: 'FILL' 1;
+  width: 18px;
+  height: 18px;
 }
 
 .tab-text {
+  margin-top: 4px;
   font-size: 10px;
-  font-weight: 600;
-  color: #9ca5b7;
+  font-weight: 700;
+  color: #8b92a0;
 }
 
-.tab-text-active,
-.tab-item-active .tab-icon {
-  color: #2450db;
-}
-
-button::after {
-  border: none;
+.tab-text-active {
+  color: #1847d7;
 }
 </style>

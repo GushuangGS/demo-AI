@@ -2,40 +2,21 @@
   "pages": [
     "pages/index/index",
     "pages/order/order",
-    "pages/order/detail",
-    "pages/order/service",
-    "pages/order/review",
+    "pages/mine/mine",
     "pages/buy/buy",
     "pages/buy/address",
     "pages/send/send",
     "pages/errand/errand",
     "pages/all/all",
-    "pages/mine/mine"
+    "pages/order/detail",
+    "pages/order/service",
+    "pages/order/review"
   ],
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "Urban Architect",
-    "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#F8F8F8"
-  },
-  "tabBar": {
-    "color": "#434655",
-    "selectedColor": "#0037b0",
-    "backgroundColor": "#ffffff",
-    "list": [
-      {
-        "pagePath": "pages/index/index",
-        "text": "首页"
-      },
-      {
-        "pagePath": "pages/order/order",
-        "text": "订单"
-      },
-      {
-        "pagePath": "pages/mine/mine",
-        "text": "我的"
-      }
-    ]
+    "navigationBarBackgroundColor": "#F2F3F5",
+    "backgroundColor": "#F2F3F5"
   },
   "usingComponents": {}
 }

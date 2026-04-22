@@ -1,6 +1,6 @@
 {
   "navigationStyle": "custom",
-  "navigationBarTextStyle": "black",
-  "navigationBarTitleText": "首页",
-  "usingComponents": {}
+  "usingComponents": {
+    "local-icon": "../../components/LocalIcon"
+  }
 }

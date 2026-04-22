@@ -26,7 +26,8 @@
               class="star-icon"
               :class="{ 'star-icon-active': star <= rating }"
               @click="rating = star"
-             name="star" />
+              name="star"
+            />
           </view>
           <text class="rating-text">{{ ratingText }}</text>
         </view>
@@ -66,6 +67,8 @@
 </template>
 
 <script setup>
+import LocalIcon from '@/components/LocalIcon.vue';
+
 import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 
@@ -138,6 +141,8 @@ const submitReview = () => {
   z-index: 20;
   height: 60px;
   padding: 0 16px;
+  padding-top: var(--status-bar-height, env(safe-area-inset-top));
+  box-sizing: content-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -160,9 +165,9 @@ const submitReview = () => {
 }
 
 .back-icon {
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: #1847d7;
-  font-variation-settings: 'FILL' 1;
 }
 
 .top-title {
@@ -241,9 +246,9 @@ const submitReview = () => {
 }
 
 .star-icon {
-  font-size: 34px;
+  width: 34px;
+  height: 34px;
   color: #ccd3e3;
-  font-variation-settings: 'FILL' 1;
 }
 
 .star-icon-active {

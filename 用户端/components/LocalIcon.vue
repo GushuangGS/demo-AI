@@ -13,14 +13,15 @@ const props = defineProps({
   },
 });
 
-const iconSrc = computed(() => localIconMap[props.name] || '');
+const normalizedName = computed(() => String(props.name || '').trim());
+
+const iconSrc = computed(() => localIconMap[normalizedName.value] || '');
 </script>
 
 <style scoped>
 .local-icon {
-  width: 1em;
-  height: 1em;
-  display: inline-block;
-  vertical-align: middle;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 </style>

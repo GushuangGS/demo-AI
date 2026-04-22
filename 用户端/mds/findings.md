@@ -58,3 +58,12 @@
 - `buy.vue`、`send.vue`、`errand.vue`、`all.vue` 现统一通过 `buildCommonOrderRecord()` 和 `submitOrderRecord()` 写入订单仓库。
 - `detail.vue` 现会优先按 `orderNo` 从订单仓库读取完整订单记录，并根据 `type` 渲染专属详情区块。
 - 四类订单详情都已能保留更多字段，如图片、地址、备注、预算、需求标签、时效和费用说明。
+
+## 本轮首页与根页复刻
+
+- `首页` 与 `我的` 文件夹中的 `code.html` 对应的是两张根页面原型，项目中此前只有占位 `pages/index/index.vue`，且不存在真正的 `pages/mine/mine.vue` 与 `pages/order/order.vue`。
+- `pages.json` 此前只注册了首页，导致已有业务页与订单详情页在小程序侧并不完整可达；本轮已补齐全部用到的页面注册。
+- 由于项目需要保留设计稿里的自定义底部导航，不能直接启用 uni-app 原生 `tabBar`；否则会和页面底部导航重复显示。
+- 为兼容这一点，提交订单后的返回链路和业务页底部导航统一改为 `uni.reLaunch()` 跳根页，而不是依赖 `uni.switchTab()`。
+- 现已新增三个真实根页：`pages/index/index.vue`、`pages/order/order.vue`、`pages/mine/mine.vue`，分别对应首页、订单、我的三大入口。
+- 根页实现中仅使用当前本地图标表里已有的 PNG 图标名，避开原型 HTML 中缺失的 `policy`、`schedule_send`、`calendar_today` 等图标，确保小程序端图标可以正常显示。

@@ -1,118 +1,83 @@
 {
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^LocalIcon$": "@/components/LocalIcon.vue"
+    }
+  },
   "pages": [
     {
       "path": "pages/index/index",
       "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "首页"
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/order/order",
       "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "订单"
-      }
-    },
-    {
-      "path": "pages/order/detail",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "订单详情"
-      }
-    },
-    {
-      "path": "pages/order/service",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "联系客服"
-      }
-    },
-    {
-      "path": "pages/order/review",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "评价订单"
-      }
-    },
-    {
-      "path": "pages/buy/buy",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "帮我买"
-      }
-    },
-    {
-      "path": "pages/buy/address",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "地址管理"
-      }
-    },
-    {
-      "path": "pages/send/send",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "帮我送"
-      }
-    },
-    {
-      "path": "pages/errand/errand",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "帮我办"
-      }
-    },
-    {
-      "path": "pages/all/all",
-      "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "万能帮"
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/mine/mine",
       "style": {
-        "navigationStyle": "custom",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "我的"
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/buy/buy",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/buy/address",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/send/send",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/errand/errand",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/all/all",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/order/detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/order/service",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/order/review",
+      "style": {
+        "navigationStyle": "custom"
       }
     }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "Urban Architect",
-    "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#F8F8F8"
-  },
-  "tabBar": {
-    "color": "#434655",
-    "selectedColor": "#0037b0",
-    "backgroundColor": "#ffffff",
-    "list": [
-      {
-        "pagePath": "pages/index/index",
-        "text": "首页"
-      },
-      {
-        "pagePath": "pages/order/order",
-        "text": "订单"
-      },
-      {
-        "pagePath": "pages/mine/mine",
-        "text": "我的"
-      }
-    ]
+    "navigationBarBackgroundColor": "#F2F3F5",
+    "backgroundColor": "#F2F3F5"
   },
   "uniIdRouter": {}
 }
