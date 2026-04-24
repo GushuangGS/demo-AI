@@ -5,6 +5,19 @@ const DEMO_LOGIN_PAYLOAD = {
   nickname: '演示用户',
 };
 
+export const loginApi = async (payload) => {
+  const result = await request({
+    url: '/auth/login',
+    method: 'POST',
+    data: payload,
+  });
+
+  uni.setStorageSync(USER_TOKEN_STORAGE_KEY, result.token);
+  uni.setStorageSync(USER_PROFILE_STORAGE_KEY, result.user);
+
+  return result;
+};
+
 export const ensureDemoLogin = async () => {
   const cachedUser = uni.getStorageSync(USER_PROFILE_STORAGE_KEY);
   const cachedToken = uni.getStorageSync(USER_TOKEN_STORAGE_KEY);

@@ -14,12 +14,18 @@
           <view class="hero-card" @tap="handleLogin">
             <view class="hero-avatar-shell">
               <view class="hero-avatar">
-                <LocalIcon class="hero-avatar-icon" name="account_circle" />
+                <image
+                  v-if="userInfo && userInfo.avatar"
+                  :src="userInfo.avatar"
+                  class="user-avatar-img"
+                  mode="aspectFill"
+                />
+                <LocalIcon v-else class="hero-avatar-icon" name="account_circle" />
               </view>
             </view>
             <view class="hero-copy">
-              <text class="hero-title">点击登录/注册</text>
-              <text class="hero-desc">解锁优质城市服务体验</text>
+              <text class="hero-title">{{ userInfo ? userInfo.nickname : '点击登录/注册' }}</text>
+              <text class="hero-desc">{{ userInfo ? userInfo.phone || '已登录' : '解锁优质城市服务体验' }}</text>
             </view>
           </view>
 
@@ -119,7 +125,20 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 import LocalIcon from '@/components/LocalIcon.vue';
+import { loginApi } from '@/api/auth';
+import { USER_PROFILE_STORAGE_KEY } from '@/api/request';
+
+const userInfo = ref(null);
+
+onShow(() => {
+  const cachedUser = uni.getStorageSync(USER_PROFILE_STORAGE_KEY);
+  if (cachedUser) {
+    userInfo.value = cachedUser;
+  }
+});
 
 const openRootPage = (url) => {
   uni.reLaunch({ url });
@@ -133,9 +152,64 @@ const showToast = (title) => {
 };
 
 const handleLogin = () => {
-  uni.showToast({
-    title: '登录能力待接入',
-    icon: 'none',
+  if (userInfo.value) {
+    uni.showToast({ title: '您已登录', icon: 'none' });
+    return;
+  }
+
+  // 修复：uni.getUserProfile 必须直接由用户点击事件触发，不能放在 uni.login 回调中
+  uni.getUserProfile({
+    desc: '获取您的头像昵称用于个人中心展示',
+    success: (infoRes) => {
+      const { nickName, avatarUrl } = infoRes.userInfo;
+      console.log(infoRes, '00000');
+
+      uni.login({
+        provider: 'weixin',
+        success: async (loginRes) => {
+          if (loginRes.code) {
+            try {
+              uni.showLoading({ title: '登录中...' });
+              // 提示：真实的手机号需要通过 <button open-type="getPhoneNumber"> 获取，
+              // 无法通过 uni.getUserProfile 拿到。此处为了完整演示流程，我们保持登录调用
+              const result = await loginApi({
+                phone: '13800138000', // 如果有真实后端，这里需用 getPhoneNumber 获取到的 code 去后端换取手机号
+                nickname: nickName,
+                avatar: avatarUrl,
+              });
+
+              userInfo.value = result.user;
+              uni.hideLoading();
+              uni.showToast({ title: '登录成功', icon: 'success' });
+            } catch (err) {
+              uni.hideLoading();
+              uni.showToast({ title: '登录失败', icon: 'none' });
+            }
+          }
+        },
+        fail: () => {
+          uni.showToast({ title: '获取登录凭证失败', icon: 'none' });
+        },
+      });
+    },
+    fail: () => {
+      // 降级处理，用户拒绝授权或基础库不支持时
+      uni.showLoading({ title: '登录中...' });
+      loginApi({
+        phone: '13800138000',
+        nickname: '微信用户',
+        avatar: '',
+      })
+        .then((result) => {
+          userInfo.value = result.user;
+          uni.hideLoading();
+          uni.showToast({ title: '登录成功（降级）', icon: 'success' });
+        })
+        .catch(() => {
+          uni.hideLoading();
+          uni.showToast({ title: '登录失败', icon: 'none' });
+        });
+    },
   });
 };
 
@@ -266,6 +340,12 @@ const goServiceCenter = () => {
   width: 40px;
   height: 40px;
   opacity: 0.45;
+}
+
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .hero-copy {

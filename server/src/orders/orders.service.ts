@@ -17,9 +17,18 @@ const DEFAULT_USER_ID = 'user_demo_001';
 export class OrdersService {
   private readonly ordersFile = join(process.cwd(), 'data', 'orders.json');
 
+  /**
+   * 获取用户工作台看板数据
+   * 1. 过滤获取当前用户的所有订单
+   * 2. 分别提取最新的“待接单”与“进行中”状态订单，用于首页重点展示
+   * 3. 统计各状态的订单数量，返回统计报表
+   * @param userId 当前用户ID，默认为测试用户
+   */
   async getDashboard(userId = DEFAULT_USER_ID) {
+    // 步骤1：获取当前用户的订单列表
     const userOrders = await this.getUserOrders(userId);
 
+    // 步骤2 & 3：组装看板数据，包括核心订单项及各状态的数量统计
     return {
       pendingOrder: userOrders.find((item) => item.status === 'pending'),
       activeOrder:
@@ -37,15 +46,25 @@ export class OrdersService {
     };
   }
 
+  /**
+   * 查询订单列表
+   * 1. 加载所有订单数据
+   * 2. 根据用户ID和订单状态进行过滤
+   * 3. 按更新时间倒序排列（最新的订单排在最前）
+   * @param status 可选的过滤状态
+   * @param userId 当前用户ID
+   */
   async list(status?: OrderStatus, userId?: string) {
     const orders = await this.getOrders();
     const targetUserId = userId || DEFAULT_USER_ID;
 
+    // 步骤1：过滤属于该用户且匹配特定状态的订单
     const filtered = orders.filter(
       (item: OrderRecord) =>
         item.userId === targetUserId && (!status || item.status === status),
     );
 
+    // 步骤2：按照 updatedAt 字段倒序排列
     filtered.sort(
       (a: OrderRecord, b: OrderRecord) =>
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
@@ -54,6 +73,12 @@ export class OrdersService {
     return filtered;
   }
 
+  /**
+   * 获取订单详情
+   * 1. 通过内部 findOrder 方法查找指定订单
+   * 2. 如果不存在则抛出 404 异常
+   * @param id 订单唯一ID或订单编号
+   */
   async detail(id: string) {
     const order = await this.findOrder(id);
 
@@ -64,12 +89,27 @@ export class OrdersService {
     return order;
   }
 
+  /**
+   * 创建订单
+   * 1. 加载现有所有订单数据
+   * 2. 生成新订单的基本字段：如ID、时间戳、单号
+   * 3. 补齐各服务类型（帮我买、帮我送等）特定的兜底字段：如状态文案、状态分类、操作按钮文案、订单详情结构等
+   * 4. 保存新订单至JSON存储文件并返回给客户端
+   * @param payload 客户端传入的创建订单DTO
+   */
   async create(payload: CreateOrderDto) {
+    // 步骤1：获取所有订单记录以进行存储操作
     const orders = await this.getOrders();
     const now = new Date().toISOString();
+
+    // 步骤2：构建订单的核心基础数据（如流水号、业务类型中文名）
     const orderNo = this.buildOrderNo(payload.serviceType);
     const serviceLabel = this.getServiceLabel(payload.serviceType);
+
+    // 初始化默认状态，未传时默认为 'in_progress'
     const status = payload.status || 'in_progress';
+
+    // 如果状态为进行中，默认模拟指派一名骑手
     const defaultRider =
       status === 'in_progress'
         ? {
@@ -81,22 +121,29 @@ export class OrdersService {
           }
         : undefined;
 
+    // 步骤3：组装最终写入存储的订单记录
     const order: OrderRecord = {
       id: `order_${Date.now()}`,
       userId: payload.userId || DEFAULT_USER_ID,
       orderNo,
       serviceType: payload.serviceType,
       serviceLabel,
+
+      // 状态相关字段映射
       status,
       statusLabel: this.getStatusLabel(status),
       filter: this.getFilter(status),
       category: serviceLabel,
+
+      // 业务信息
       projectName: payload.projectName,
       projectDesc: payload.projectDesc,
       goods: payload.goods,
       price: Number(payload.price || 0),
       paymentMethod: payload.paymentMethod || '微信支付',
       image: payload.image || this.getServiceImage(payload.serviceType),
+
+      // 地点及时间信息
       pickupTitle: payload.pickupTitle,
       pickupDetail: payload.pickupDetail,
       receiverTitle: payload.receiverTitle,
@@ -106,13 +153,19 @@ export class OrdersService {
       eta:
         payload.eta || (status === 'in_progress' ? '预计稍后完成' : undefined),
       note: payload.note?.trim() || '',
+
+      // 动作及展示状态映射
       actionText: this.getActionText(status),
       actionType: this.getActionType(status),
       secondary: status === 'completed',
+
+      // 履约及步骤信息：如果客户端未传则由服务端自动生成兜底的流转步骤
       rider: payload.rider || defaultRider,
       steps: payload.steps?.length
         ? payload.steps
         : this.buildDefaultSteps(status, payload.serviceType, now),
+
+      // 视图展示需要的复合字段映射
       address: {
         title: payload.receiverTitle,
         detail: payload.receiverDetail,
@@ -128,20 +181,34 @@ export class OrdersService {
         defaultRider?.name ||
         this.getDefaultAssignee(payload.serviceType),
       detailSummary: payload.detailSummary || payload.projectDesc,
+
+      // 兜底补齐业务定制的详细分发段内容
       detailSections:
         payload.detailSections ||
         this.buildFallbackDetailSections(payload.serviceType, payload),
+
       createdAt: now,
       updatedAt: now,
     };
 
+    // 步骤4：将新订单放入首位，并持久化到本地文件
     orders.unshift(order);
     await writeJsonFile(this.ordersFile, orders);
 
     return order;
   }
 
+  /**
+   * 更新订单状态
+   * 1. 查找指定订单，若不存在则抛错
+   * 2. 更新订单状态及相关的衍生展示字段（状态标签、过滤类别、操作文案等）
+   * 3. 如果状态流转为进行中（in_progress），模拟生成接单的骑手数据及最新的订单流转步骤
+   * 4. 保存最新状态至本地JSON文件
+   * @param id 订单的ID或单号
+   * @param payload 更新的数据载体（包含新状态等）
+   */
   async updateStatus(id: string, payload: UpdateOrderStatusDto) {
+    // 步骤1：获取订单列表并找到目标订单
     const orders = await this.getOrders();
     const target = orders.find((item) => item.id === id || item.orderNo === id);
 
@@ -149,6 +216,7 @@ export class OrdersService {
       throw new Error('订单不存在');
     }
 
+    // 步骤2：更新基础状态及衍生UI显示字段
     target.status = payload.status;
     target.statusLabel = this.getStatusLabel(payload.status);
     target.filter = this.getFilter(payload.status);
@@ -157,6 +225,7 @@ export class OrdersService {
     target.secondary = payload.status === 'completed';
     target.updatedAt = new Date().toISOString();
 
+    // 步骤3：如果是变为进行中（例如接单场景），模拟增加接单人员和时间线
     if (payload.status === 'in_progress') {
       target.eta = target.eta || '预计 18:30 送达';
       target.rider = {
@@ -166,6 +235,7 @@ export class OrdersService {
         avatar:
           'https://images.unsplash.com/photo-1541534401786-2077eed87a72?auto=format&fit=crop&w=240&q=80',
       };
+      // 更新订单进度步骤
       target.steps = [
         {
           title: '骑手已接单',
@@ -183,10 +253,15 @@ export class OrdersService {
       target.assignee = target.rider.name;
     }
 
+    // 步骤4：持久化到文件并返回结果
     await writeJsonFile(this.ordersFile, orders);
     return target;
   }
 
+  /**
+   * 确保并获取全局订单JSON文件内容
+   * 如果文件不存在或为空，使用 buildSeedOrders 作为默认种子数据写入文件
+   */
   private async getOrders() {
     return ensureJsonFile<OrderRecord[]>(
       this.ordersFile,
@@ -194,6 +269,9 @@ export class OrdersService {
     );
   }
 
+  /**
+   * 过滤并按更新时间倒序返回特定用户的所有订单记录
+   */
   private async getUserOrders(userId = DEFAULT_USER_ID) {
     const orders = await this.getOrders();
     return orders
@@ -204,11 +282,18 @@ export class OrdersService {
       );
   }
 
+  /**
+   * 根据ID或订单编号精确查找单条记录
+   */
   private async findOrder(id: string) {
     const orders = await this.getOrders();
     return orders.find((item) => item.id === id || item.orderNo === id);
   }
 
+  /**
+   * 构造系统的初始化种子订单数据
+   * 预制四种业务类型的历史记录，便于新用户测试预览
+   */
   private buildSeedOrders(): OrderRecord[] {
     const now = new Date();
     const iso = (minuteOffset: number) =>
@@ -547,6 +632,12 @@ export class OrdersService {
     return mapping[type];
   }
 
+  /**
+   * 自动生成默认订单流转进度（时间线状态）
+   * @param status 订单状态
+   * @param serviceType 服务类型
+   * @param time 当前时间字符串
+   */
   private buildDefaultSteps(
     status: OrderStatus,
     serviceType: OrderServiceType,
@@ -586,6 +677,10 @@ export class OrdersService {
     ];
   }
 
+  /**
+   * 后端兜底策略：当客户端为简化请求Payload未传特定业务线的专属详情模块时，
+   * 服务端基于核心字段推导并组装默认的服务详情（DetailSections）以确保多态UI正常渲染
+   */
   private buildFallbackDetailSections(
     type: OrderServiceType,
     payload: Pick<
@@ -654,10 +749,16 @@ export class OrdersService {
     };
   }
 
+  /**
+   * 格式化数字价格为人民币显示格式
+   */
   private formatPrice(price: number) {
     return `¥${Number(price || 0).toFixed(2)}`;
   }
 
+  /**
+   * 依据业务类型与时间戳构造前缀订单号
+   */
   private buildOrderNo(type: OrderServiceType) {
     const prefixMap: Record<OrderServiceType, string> = {
       buy: 'BUY',
@@ -668,6 +769,9 @@ export class OrdersService {
     return `${prefixMap[type]}-${Date.now()}`;
   }
 
+  /**
+   * 格式化 ISO 时间字符串为 "HH:mm"
+   */
   private formatTime(value: string) {
     return new Date(value).toLocaleTimeString('zh-CN', {
       hour: '2-digit',
